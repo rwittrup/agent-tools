@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
-# Sync local ./skills and ./agents into Cursor/Claude agent paths via symlinks.
-# For each entry under skills/ and agents/, ensures a symlink exists in the
+# Sync local .cursor/skills and .cursor/agents into Cursor/Claude agent paths via symlinks.
+# For each entry under .cursor/skills/ and .cursor/agents/, ensures a symlink exists in the
 # corresponding home directories pointing at this repo. Idempotent: correct
 # symlinks are left unchanged; missing symlinks are created.
+#
+# If you previously symlinked from ./skills or ./agents and see "exists but points elsewhere",
+# remove the stale symlink under ~/.agents/skills, ~/.cursor/skills, ~/.cursor/agents, or
+# ~/.claude/agents and run this script again.
 #
 # Default: quiet (errors only; one summary line if anything was created).
 # Use -v / --verbose for per-symlink logs. See --help.
@@ -14,8 +18,8 @@ created_count=0
 skipped_count=0
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SKILLS_SRC="${REPO_ROOT}/skills"
-AGENTS_SRC="${REPO_ROOT}/agents"
+SKILLS_SRC="${REPO_ROOT}/.cursor/skills"
+AGENTS_SRC="${REPO_ROOT}/.cursor/agents"
 
 SKILL_DEST_DIRS=(
   "${HOME}/.agents/skills"
@@ -39,6 +43,10 @@ vlog() {
 usage() {
   cat <<'EOF'
 Usage: sync-skills-and-agents.sh [-v|--verbose]
+
+  Sources (repo root = directory containing this script):
+    .cursor/skills/*  →  ~/.agents/skills/<name>, ~/.cursor/skills/<name>
+    .cursor/agents/*  →  ~/.cursor/agents/<name>, ~/.claude/agents/<name>
 
   Default: quiet — prints only errors, plus one line if new symlinks were created.
   -v, --verbose  Log each symlink check (unchanged and created).

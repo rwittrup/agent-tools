@@ -32,7 +32,7 @@ This complements chat feedback; it is the durable copy for post-merge follow-ups
 ## Process
 
 ### 1. Open the Draft PR
-Use the **pr-formatting** skill (`.agents/skills/pr-formatting/SKILL.md`) to produce the PR description.
+Use the **pr-formatting** skill (`.cursor/skills/pr-formatting/SKILL.md`) to produce the PR description.
 Open it as a **draft** on the correct position in the Graphite stack.
 
 ### 2. Review the Implementation

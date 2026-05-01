@@ -54,7 +54,7 @@ At the **repository root**, maintain a durable copy of validation materials unde
 
 If the canonical runnable script lives under **`dev/scripts/`** or next to the feature, keep it there for CI/repo conventions and **also** copy or reference it from **`validation-artifact.md`** under **`.artifacts/`** so the entrypoint is obvious.
 
-**Related agent outputs** in the same **`.artifacts/{LINEAR_TICKET}/`** directory: planner (`plan.md`, `linear-tickets.md`), validator (`validation-report.md`, `validation-handoff.json`), reviewer (`review-notes.md`) — see `.cursor/agents/planner-v2.md`, `validator-v1.md`, `reviewer-v1.md`.
+**Related agent outputs** in the same **`.artifacts/{LINEAR_TICKET}/`** directory: planner (`plan.md`, `linear-tickets.md`), validator (`validation-report.md`, `validation-handoff.json`), reviewer (`review-notes.md`) — see `.cursor/agents/planner-v2.md`, `.cursor/agents/validator-v1.md`, `.cursor/agents/reviewer-v1.md`.
 
 **Git:** `.artifacts/` is in the repository root **`.gitignore`**; these copies stay local unless that ignore rule is changed.
 

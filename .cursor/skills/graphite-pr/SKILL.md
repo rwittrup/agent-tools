@@ -14,7 +14,7 @@ Compose **Graphite CLI steps** with **PR description formatting** from the repos
 ## Read first
 
 1. **Graphite mechanics** — Read `.cursor/skills/graphite/SKILL.md` for `gt create`, `gt modify`, `gt submit`, `gt ls`, `gt restack`, branch naming, untracked branches, stack parentage, troubleshooting.
-2. **PR body shape** — Read `.agents/skills/pr-formatting/SKILL.md` for the full template (Summary, Context, Changes, Validation, Stack, Linear), rules, and frontend-only Validation variant.
+2. **PR body shape** — Read `.cursor/skills/pr-formatting/SKILL.md` for the full template (Summary, Context, Changes, Validation, Stack, Linear), rules, and frontend-only Validation variant.
 
 Do not invent a different PR outline; use the pr-formatting template and rules.
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# When commits touch agents/ or skills/, refresh home symlinks via sync script.
+# When commits touch .cursor/agents/ or .cursor/skills/, refresh home symlinks via sync script.
 # If sync fails, the commit is aborted.
 
 set -euo pipefail
@@ -10,7 +10,7 @@ cd "$ROOT"
 STAGED=$(git diff --cached --name-only || true)
 [[ -n "$STAGED" ]] || exit 0
 
-if ! printf '%s\n' "$STAGED" | grep -qE '^(agents/|skills/)'; then
+if ! printf '%s\n' "$STAGED" | grep -qE '^\.cursor/(agents|skills)/'; then
   exit 0
 fi
 

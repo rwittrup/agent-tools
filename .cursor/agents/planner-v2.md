@@ -126,4 +126,4 @@ Artifacts must also be saved under **`.artifacts/{LINEAR_TICKET}/`** as describe
 - Make technology choices not already established in the codebase
 - Create tickets for work outside the chosen approach's scope
 
-For deeper option design before narrowing to three approaches, use the **design-planning** skill (`.agents/skills/design-planning/SKILL.md`).
+For deeper option design before narrowing to three approaches, use the **design-planning** skill (`.cursor/skills/design-planning/SKILL.md`).

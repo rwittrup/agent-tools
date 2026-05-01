@@ -36,7 +36,7 @@ When you complete Step 6 (green run), append or add **`implementation-summary.md
 
 ## Process
 
-Follow **validation-artifact-generation** (`.agents/skills/validation-artifact-generation/SKILL.md`; linked from `.agent/skills/` / `.claude/skills/` in this repo) for artifact structure and examples. The workflow below is authoritative for sequencing.
+Follow **validation-artifact-generation** (`.cursor/skills/validation-artifact-generation/SKILL.md`; linked from `~/.agents/skills/` / `~/.claude/skills/` via symlinks from this repo) for artifact structure and examples. The workflow below is authoritative for sequencing.
 
 ### Step 1 — Validation plan
 
@@ -69,7 +69,7 @@ After human go-ahead (or immediately under the unit-test-only exception):
 1. Implement the feature per the ticket and plan until the artifact passes.
 2. Keep changes scoped to files identified in the ticket.
 3. Follow existing patterns — do not introduce new conventions without flagging it.
-4. Make **small, logical commits** with **commit-formatting** (`.claude/skills/commit-formatting/SKILL.md`). No commit leaves the system broken. If the human asks for a **single** commit for the whole ticket, comply.
+4. Make **small, logical commits** with **commit-formatting** (`.cursor/skills/commit-formatting/SKILL.md`). No commit leaves the system broken. If the human asks for a **single** commit for the whole ticket, comply.
 
 ### Step 6 — Green run
 
@@ -78,7 +78,7 @@ Run the validation artifact and relevant unit tests; everything must pass before
 ---
 
 ## Commit Formatting
-Follow **commit-formatting** for every commit (`.claude/skills/commit-formatting/SKILL.md`).
+Follow **commit-formatting** for every commit (`.cursor/skills/commit-formatting/SKILL.md`).
 
 ---
 
