@@ -4,9 +4,7 @@
 # corresponding home directories pointing at this repo. Idempotent: correct
 # symlinks are left unchanged; missing symlinks are created.
 #
-# If you previously symlinked from ./skills or ./agents and see "exists but points elsewhere",
-# remove the stale symlink under ~/.agents/skills, ~/.cursor/skills, ~/.cursor/agents, or
-# ~/.claude/agents and run this script again.
+# Symlinks that point at the wrong target are removed and recreated.
 #
 # Default: quiet (errors only; one summary line if anything was created).
 # Use -v / --verbose for per-symlink logs. See --help.
@@ -15,6 +13,7 @@ set -euo pipefail
 
 VERBOSE=0
 created_count=0
+replaced_count=0
 skipped_count=0
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -48,8 +47,11 @@ Usage: sync-skills-and-agents.sh [-v|--verbose]
     .cursor/skills/*  →  ~/.agents/skills/<name>, ~/.cursor/skills/<name>
     .cursor/agents/*  →  ~/.cursor/agents/<name>, ~/.claude/agents/<name>
 
-  Default: quiet — prints only errors, plus one line if new symlinks were created.
-  -v, --verbose  Log each symlink check (unchanged and created).
+  Wrong-target symlinks are replaced automatically (same name).
+
+  Default: quiet — prints only errors, plus one line if symlinks were created
+  or replaced.
+  -v, --verbose  Log each symlink check (unchanged, created, replaced).
 EOF
 }
 
@@ -75,11 +77,13 @@ read_symlink_target() {
 
 # link_one <dest_parent> <link_name> <source_path>
 # source_path must exist. Creates dest_parent/link_name -> source (absolute).
+# Wrong-target symlinks are removed and recreated.
 link_one() {
   local dest_parent="$1"
   local link_name="$2"
   local source_path="$3"
   local dest="${dest_parent}/${link_name}"
+  local replaced=0
 
   [[ -e "$source_path" ]] || die "source missing: $source_path"
 
@@ -94,7 +98,9 @@ link_one() {
       vlog "ok (already linked): $dest -> $source_abs"
       return 0
     fi
-    die "exists but points elsewhere: $dest -> $current (expected $source_abs)"
+    vlog "replacing wrong symlink: $dest (was $current, want $source_abs)"
+    rm "$dest" || die "could not remove symlink: $dest"
+    replaced=1
   fi
 
   if [[ -e "$dest" ]]; then
@@ -102,8 +108,13 @@ link_one() {
   fi
 
   ln -s "$source_abs" "$dest" || die "ln -s failed: $dest"
-  ((created_count++)) || true
-  vlog "created: $dest -> $source_abs"
+  if [[ "$replaced" -eq 1 ]]; then
+    ((replaced_count++)) || true
+    vlog "replaced: $dest -> $source_abs"
+  else
+    ((created_count++)) || true
+    vlog "created: $dest -> $source_abs"
+  fi
 }
 
 main() {
@@ -155,8 +166,8 @@ main() {
   if [[ "$VERBOSE" -eq 1 ]]; then
     echo "done."
   else
-    if [[ "$created_count" -gt 0 ]]; then
-      echo "Created ${created_count} symlink(s) (${skipped_count} already correct)."
+    if [[ "$created_count" -gt 0 ]] || [[ "$replaced_count" -gt 0 ]]; then
+      echo "Symlinks: ${created_count} created, ${replaced_count} replaced (${skipped_count} already correct)."
     fi
   fi
 }
