@@ -1,8 +1,4 @@
 ---
-skills:
-  - react-ui-implementation
-  - css-best-practices
-  - mcp-usage
 name: design-expert-reviewer-v1
 model: default
 description: Design system compliance reviewer. Use proactively after UI code changes to verify @prepared/ui-core usage, design tokens, spacing values, and component choices.
