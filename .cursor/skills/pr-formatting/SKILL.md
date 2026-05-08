@@ -44,17 +44,6 @@ A reviewer or future engineer should be able to re-run this independently.
    SELECT * FROM calls WHERE status = 'completed' LIMIT 5;
    ```
    Expected: records present with correct fields populated
-
-### Test Results
-Summarize what was run and the outcome. Link to CI if available.
-
-## Stack
-- **Position:** [e.g., 1 of 3]
-- **Depends on:** [PR link or "none"]
-- **Blocks:** [PR link or "none"]
-
-## Linear
-[Ticket ID + link]
 ```
 
 ---

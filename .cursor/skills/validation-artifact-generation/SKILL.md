@@ -1,6 +1,6 @@
 ---
 name: validation-artifact-generation
-description: Validation-before-implementation—plan, tests with minimal compile stubs, one runnable artifact (prefer integration/API-level checks when practical plus unit tests), red run and pause unless the plan is unit-test-only; aligned with implementer-v2.
+description: Validation-before-implementation—plan, tests with minimal compile stubs, one runnable artifact (prefer integration/API-level checks when practical plus unit tests), red run and pause unless the plan is unit-test-only; aligned with implementer.
 ---
 
 # Skill: Validation Artifact Generator
@@ -8,11 +8,9 @@ description: Validation-before-implementation—plan, tests with minimal compile
 ## Purpose
 Produce a complete, runnable validation artifact from a Linear ticket **before** the real implementation lands. The artifact is the TDD contract — fail first on red, pass when the feature is done.
 
-Stay aligned with **implementer-v2** (`.cursor/agents/implementer-v2.md`): same sequencing, the **unit-test-only** shortcut below, and **Artifact storage** (ticket-scoped files under `.artifacts/`).
-
 ---
 
-## Workflow order (use with implementer-v2)
+## Workflow order
 
 1. **Validation plan** — §1; maps ACs to checks. Persist **`validation-plan.md`** under **`.artifacts/{LINEAR_TICKET}/`** when the plan is ready (see **Artifact storage**).
 2. **Tests from the plan** — §2; write all tests; production code only **minimal stubs** so the project compiles/builds (not a working feature).
@@ -44,7 +42,7 @@ If the validation plan consists **solely** of unit tests (no integration tests, 
 
 ## Artifact storage (required)
 
-At the **repository root**, maintain a durable copy of validation materials under **`.artifacts/{LINEAR_TICKET}/`** using the Linear issue key (e.g. `ANET-2636`). Create the directory if it does not exist. This matches **implementer-v2** and pairs with planner / validator / reviewer outputs in the same folder.
+At the **repository root**, maintain a durable copy of validation materials under **`.artifacts/{LINEAR_TICKET}/`** using the Linear issue key (e.g. `ANET-2636`). Create the directory if it does not exist.
 
 | File | Contents |
 |------|----------|
@@ -53,8 +51,6 @@ At the **repository root**, maintain a durable copy of validation materials unde
 | `implementation-summary.md` | After implementation is complete and the artifact is green: short bullet summary of what changed and why (scoped to this ticket). |
 
 If the canonical runnable script lives under **`dev/scripts/`** or next to the feature, keep it there for CI/repo conventions and **also** copy or reference it from **`validation-artifact.md`** under **`.artifacts/`** so the entrypoint is obvious.
-
-**Related agent outputs** in the same **`.artifacts/{LINEAR_TICKET}/`** directory: planner (`plan.md`, `linear-tickets.md`), validator (`validation-report.md`, `validation-handoff.json`), reviewer (`review-notes.md`) — see `.cursor/agents/planner-v2.md`, `.cursor/agents/validator-v1.md`, `.cursor/agents/reviewer-v1.md`.
 
 **Git:** `.artifacts/` is in the repository root **`.gitignore`**; these copies stay local unless that ignore rule is changed.
 
