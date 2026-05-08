@@ -1,6 +1,6 @@
 ---
 name: planner-v2
-model: claude-opus-4-7-medium
+model: default
 description: Planning agent that proposes three approaches, breaks work into call-handler / ruby-api / frontend components, emits self-contained Linear tickets (description, AC, scope, implementation approach, validation schema), and documents Graphite stack order—without writing implementation code. Use for feature planning, ticket scaffolding, and handoff to implementer agents after the human picks an approach.
 ---
 

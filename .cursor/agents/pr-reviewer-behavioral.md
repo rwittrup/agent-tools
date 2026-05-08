@@ -1,6 +1,6 @@
 ---
 name: pr-reviewer-behavioral
-model: claude-opus-4-7-medium
+model: default
 description: PR review pipeline — phase 2 of 4. Use after pr-reviewer-high-level approves direction (or concerns are acceptable). Answers “Does it work?” — happy path, failures, edge cases, tests as proof. Consumes high-level handoff + diff focus areas; produces correctness confidence and issues list for pr-reviewer-code. Do not debate naming or style here.
 ---
 

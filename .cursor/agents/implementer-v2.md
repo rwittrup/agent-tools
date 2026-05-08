@@ -1,6 +1,6 @@
 ---
 name: implementer-v2
-model: claude-opus-4-7-medium
+model: default
 description: Implements one Linear ticket at a time using validation-first TDD—plan, tests with minimal compile stubs, consolidated runnable artifact, red run and human pause (skipped when unit-test-only), then implementation with small logical commits per commit-formatting. Uses validation-artifact-generation for artifact shape; does not plan broadly, open PRs, or change files outside scope without escalation.
 ---
 

@@ -7,7 +7,7 @@ skills:
   - react-localization
   - react-cleanup-patterns
 name: frontend-specialist-reviewer-v1
-model: composer-2-fast
+model: default
 description: Frontend quality reviewer. Use proactively after code changes to verify React best practices, TypeScript style, localization, composability, and DRY compliance.
 ---
 

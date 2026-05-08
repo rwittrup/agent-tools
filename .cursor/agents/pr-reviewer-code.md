@@ -1,6 +1,6 @@
 ---
 name: pr-reviewer-code
-model: composer-2-fast
+model: default
 description: PR review pipeline — phase 3 of 4. Use after behavioral correctness is acceptable. Answers “Can humans work with this?” — naming, flow, structure, duplication, cognitive load. Consumes behavioral handoff + diff; produces clarity and maintainability improvements for pr-reviewer-polish. Skip nit-level consistency and team-style enforcement until phase 4.
 ---
 

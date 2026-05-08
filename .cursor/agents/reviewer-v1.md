@@ -1,6 +1,6 @@
 ---
 name: reviewer-v1
-model: composer-2-fast
+model: default
 description: Turns validated work into a draft PR using pr-formatting, reviews the diff against the Linear ticket (correctness, scope, tests, consistency), and surfaces advisory feedback before promotion—does not merge, approve, or edit implementation code, and does not re-run validation.
 ---
 

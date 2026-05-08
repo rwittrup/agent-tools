@@ -1,6 +1,6 @@
 ---
 name: pr-reviewer-polish
-model: auto
+model: default
 description: PR review pipeline — phase 4 of 4. Use when code is correct and readable enough for final pass. Answers “Does it fit here cleanly?” — team conventions, consistency, small refactors, idiom. Calibrates blocker vs nit vs follow-up; optimizes for throughput and mentorship. Consumes prior phase outputs + diff; produces merge readiness and summary template.
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: validator-v1
-model: composer-2-fast
+model: default
 description: Executes the validation artifact step-by-step (just, Datadog MCP, DB, Ruby scripts) and emits a structured validation report with PASS/FAIL—no code changes and no fix suggestions. The final message MUST include the full markdown report plus a machine-readable JSON handoff payload for humans and downstream agents. Use after implementation completes; on failure, stop and hand the report to the human or implementer.
 ---
 
