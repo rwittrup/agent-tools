@@ -1,6 +1,6 @@
 ---
 name: pr-formatting
-description: Produces review-ready PR descriptions—Summary, Context, Changes, Validation (copied from the validation artifact), Stack, and Linear—so reviewers can re-run verification independently. Use when opening draft PRs, Graphite stacks, or any PR where validation steps must not be omitted.
+description: Produces review-ready PR descriptions—Summary, Context, Changes, Validation (copied from the validation artifact) so reviewers can re-run verification independently. Use when opening draft PRs, Graphite stacks, or any PR where validation steps must not be omitted.
 ---
 
 # Skill: PR Formatter
@@ -57,8 +57,6 @@ A reviewer or future engineer should be able to re-run this independently.
 **Changes** — avoid bullet lists of filenames. Group by concern and explain the intent. A reviewer should understand the shape of the change before looking at the diff.
 
 **Validation** — always present. Never omit. Copy from the validation artifact — these should match exactly what the Validator ran. A PR without validation steps is incomplete.
-
-**Stack** — always fill this in, even if it's "position 1 of 1, no dependencies." It takes 10 seconds and saves confusion.
 
 ---
 
