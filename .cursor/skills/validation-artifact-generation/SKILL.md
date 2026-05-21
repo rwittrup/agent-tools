@@ -17,7 +17,7 @@ Produce a complete, runnable validation artifact from a Linear ticket **before**
 3. **Artifact** — §4; one entrypoint that runs tests **plus** any other validation commands the plan needs. Mirror that entrypoint into **`.artifacts/{LINEAR_TICKET}/`** as **`validation-artifact.sh`** or **`validation-artifact.md`**.
 4. **Red + pause** — Run the artifact, confirm expected failures, **stop** for human review (they may re-run the artifact).  
    **Exception:** If the plan is **unit-test-only** (see below), skip pre-implementation artifact run and pause; implement with commits as appropriate, then run artifact + unit tests at the end.
-5. **Implement** until green; **small, logical commits** per commit-formatting. When green, add **`implementation-summary.md`** under **`.artifacts/{LINEAR_TICKET}/`** (ticket-scoped summary of what changed).
+5. **Implement** until green; **small, logical commits** per commit-formatting—each commit pairs tests with the behavior they assert; **never** `git add` or commit `.artifacts/`. When green, add **`implementation-summary.md`** under **`.artifacts/{LINEAR_TICKET}/`** (local only).
 
 ---
 
@@ -52,7 +52,7 @@ At the **repository root**, maintain a durable copy of validation materials unde
 
 If the canonical runnable script lives under **`dev/scripts/`** or next to the feature, keep it there for CI/repo conventions and **also** copy or reference it from **`validation-artifact.md`** under **`.artifacts/`** so the entrypoint is obvious.
 
-**Git:** `.artifacts/` is in the repository root **`.gitignore`**; these copies stay local unless that ignore rule is changed.
+**Git:** `.artifacts/` is local handoff only—never stage or commit it; do not change `.gitignore` to enforce this.
 
 ---
 

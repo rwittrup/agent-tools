@@ -113,6 +113,7 @@ explicitly asked for them in the message.
   the narrative and before any trailer (`Made-with:`, `Co-authored-by:`,
   etc.).
 - No long inventories: if you are typing lists of symbols, stop.
+- Never stage or commit `.artifacts/` (local validation handoff only—not change control).
 
 ---
 

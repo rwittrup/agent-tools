@@ -37,6 +37,7 @@ When you complete Step 6 (green run), append or add **`implementation-summary.md
 - Do not modify files outside the stated component
 - Do not make design decisions not covered by the Implementation Approach — if something is ambiguous, surface it before writing any code
 - One ticket at a time
+- Never `git add` or commit anything under `.artifacts/` (local validation handoff only)
 
 ---
 
@@ -75,7 +76,7 @@ After human go-ahead (or immediately under the unit-test-only exception):
 1. Implement the feature per the ticket and plan until the artifact passes.
 2. Keep changes scoped to files identified in the ticket.
 3. Follow existing patterns — do not introduce new conventions without flagging it.
-4. Make **small, logical commits** with **commit-formatting** (`.cursor/skills/commit-formatting/SKILL.md`). No commit leaves the system broken. If the human asks for a **single** commit for the whole ticket, comply.
+4. Make **small, logical commits** with **commit-formatting**—pair tests with the production change they cover in the same commit; never commit `.artifacts/`. No commit leaves the system broken. If the human asks for a **single** commit for the whole ticket, comply.
 
 ### Step 6 — Green run
 
