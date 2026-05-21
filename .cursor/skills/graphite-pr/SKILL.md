@@ -21,19 +21,18 @@ Do not invent a different PR outline; use the pr-formatting template and rules.
 ## End-to-end flow
 
 1. **Branch and commits** — Follow graphite skill: stage changes, `gt create … -m "…"` (or `gt modify`), correct stack parent (`main`), `gt ls` to confirm.
-2. **Draft body** — Before or right after submit, write the description using the pr-formatting template. **Validation** must be present (copy from validation artifact when one exists; use pr-formatting’s frontend section for frontend-only PRs). **Stack** always filled (even “1 of 1”).
+2. **Draft body** — Before or right after submit, write the description using the pr-formatting template. **Validation** must be present (copy from validation artifact when one exists; use pr-formatting’s frontend section for frontend-only PRs).
 3. **Submit** — `gt submit --no-interactive` (graphite skill).
 4. **Titles and bodies (required)** — GitHub/pr-lint expects allowed title formats per root `AGENTS.md` (e.g. `[TICKET-123] description`, `[HF]`, `[BUMP]`, `Bump`). After PRs exist:
    - **Never** use Bash heredocs for markdown bodies (escaping breaks content). Write the body to a file (e.g. `/tmp/pr-body.md`) with the editor `Write` tool, then:
    - `gh pr edit <NUMBER> --title "[TICKET-123] Short description" --body-file /tmp/pr-body.md`
-   - Repeat per PR in the stack; each body matches pr-formatting and reflects that PR’s scope and stack position.
+   - Repeat per PR in the stack; each body matches pr-formatting
 
 ## Quick checklist
 
 - [ ] Title matches `AGENTS.md` / CI rules.
-- [ ] Body has Summary, Context, Changes, Validation, Stack, Linear (per pr-formatting).
+- [ ] Body has Summary, Context, Changes, Validation
 - [ ] Summary is not just the ticket title; Validation is not omitted.
-- [ ] Stack section lists position, depends-on, blocks.
 
 ## Related
 
