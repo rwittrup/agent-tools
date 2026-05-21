@@ -12,7 +12,7 @@ Produce PR descriptions that are easy to review, include full context, and alway
 
 ## PR Description Template
 
-```markdown
+````markdown
 ## Summary
 One to three sentences. What does this PR do and why does it exist?
 Assume the reviewer has not read the ticket. Give them enough to orient.
@@ -40,11 +40,11 @@ A reviewer or future engineer should be able to re-run this independently.
    Expected: all tests pass, no errors
 
 2. [Step] — [what it checks]
-   ```sql
+   ```
    SELECT * FROM calls WHERE status = 'completed' LIMIT 5;
    ```
    Expected: records present with correct fields populated
-```
+````
 
 ---
 
