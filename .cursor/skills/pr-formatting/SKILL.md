@@ -1,6 +1,6 @@
 ---
 name: pr-formatting
-description: Produces review-ready PR descriptions—Summary, Context, Changes, Validation (copied from the validation artifact) so reviewers can re-run verification independently. Use when opening draft PRs, Graphite stacks, or any PR where validation steps must not be omitted.
+description: Produces review-ready PR descriptions—Summary, Context, Changes, Validation so reviewers can re-run verification independently. Use when opening draft PRs, Graphite stacks, or any PR where validation steps must not be omitted.
 ---
 
 # Skill: PR Formatter
