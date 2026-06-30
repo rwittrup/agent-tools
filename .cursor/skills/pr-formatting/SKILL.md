@@ -22,8 +22,7 @@ What problem does this solve? What was broken, missing, or needed?
 If this is part of a stack, explain where it fits and what it depends on.
 
 ## Changes
-A brief description of what was actually changed — not a file list, but a
-plain-language summary of the meaningful changes. Group logically if needed.
+A brief description of what was actually changed — not a file list, but a plain-language summary of the meaningful changes. Group logically if needed.
 
 - [change or area] — [brief explanation]
 - [change or area] — [brief explanation]

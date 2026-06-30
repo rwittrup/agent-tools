@@ -8,6 +8,10 @@ description: Produces well-formed git commit messages—50/72 rule, imperative s
 ## Purpose
 Produce well-formed git commit messages that communicate what changed and why — not how.
 
+## Scope
+
+The 50/72 rule applies **only** to `git commit` messages. PR descriptions use the **pr-formatting** skill — do not hard-wrap PR prose at 72 characters.
+
 ---
 
 ## The 50/72 Rule
