@@ -1,6 +1,6 @@
 ---
 name: graphite-pr
-description: Opens and updates GitHub PRs via Graphite (gt submit) with bodies that follow the pr-formatting template and CI title rules. Use when shipping a branch or stack, running gt submit, filling PR descriptions after Graphite creates drafts, or aligning PR text with validation artifacts and Linear.
+description: Opens and updates GitHub PRs via Graphite (gt submit) with bodies that follow the pr-formatting template and CI title rules. Use when shipping a branch or stack, running gt submit, filling PR descriptions after Graphite creates drafts, or aligning PR text with validation artifacts and Jira.
 allowed-tools:
   - "Bash(gt *)"
   - "Bash(git *)"
@@ -14,7 +14,7 @@ Compose **Graphite CLI steps** with **PR description formatting** from the repos
 ## Read first
 
 1. **Graphite mechanics** — Read `.cursor/skills/graphite/SKILL.md` for `gt create`, `gt modify`, `gt submit`, `gt ls`, `gt restack`, branch naming, untracked branches, stack parentage, troubleshooting.
-2. **PR body shape** — Read `.cursor/skills/pr-formatting/SKILL.md` for the full template (Summary, Context, Changes, Validation, Stack, Linear), rules, and frontend-only Validation variant.
+2. **PR body shape** — Read `.cursor/skills/pr-formatting/SKILL.md` for the full template (Summary, Context, Changes, Acceptance), rules, and frontend-only Validation variant.
 
 Do not invent a different PR outline; use the pr-formatting template and rules.
 

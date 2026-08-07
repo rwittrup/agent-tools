@@ -1,13 +1,13 @@
 ---
-name: linear-ticket-creating
-description: Produces structured tickets in Linear to provide developers and agents the necessary information to understand and implement a feature or user story
+name: jira-ticket-creating
+description: Produces structured tickets in Jira to provide developers and agents the necessary information to understand and implement a feature or user story
 ---
 
-# Skill: Linear Ticket Creating
+# Skill: Jira Ticket Creating
 
 ## Purpose
 
-Write a useful Linear ticket with enough information so that developers and agents can implement the feature, but without forcing a specific implementation.
+Write a useful Jira ticket with enough information so that developers and agents can implement the feature, but without forcing a specific implementation.
 
 ---
 

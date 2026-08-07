@@ -1,6 +1,6 @@
 ---
 name: graphite-branching
-description: Create Graphite branches for Ryan's work using the rwittrup/LINEAR-TICKET-description naming convention and the gt CLI. Use when starting work on a Linear ticket, creating a branch from trunk, or setting up multiple parallel trunk branches for separate components (e.g. backend and frontend) during planning. Always include the Linear ticket in the branch name. Pair with the graphite skill for stacks, submit, restack, and troubleshooting.
+description: Create Graphite branches for Ryan's work using the rwittrup/JIRA-TICKET-description naming convention and the gt CLI. Use when starting work on a Jira ticket, creating a branch from trunk, or setting up multiple parallel trunk branches for separate components (e.g. backend and frontend) during planning. Always include the Jira ticket in the branch name. Pair with the graphite skill for stacks, submit, restack, and troubleshooting.
 ---
 
 # Graphite Branching (rwittrup)
@@ -22,14 +22,14 @@ Create Graphite branches for Ryan Wittrup's work.
 
 ## Branch Naming Convention
 
-**Format:** `rwittrup/LINEAR-TICKET-rough-description-here`
+**Format:** `rwittrup/JIRA-TICKET-rough-description-here`
 
-**Always** include the Linear ticket. Description is short, kebab-case, and rough.
+**Always** include the Jira ticket. Description is short, kebab-case, and rough.
 
 | Part | Value |
 |------|-------|
 | Prefix | `rwittrup` (always) |
-| Linear ticket | `ANET-2577`, `CALL-1162`, etc. |
+| Jira ticket | `ANET-2577`, `CALL-1162`, etc. |
 | Description | short kebab-case slug |
 
 ### Examples
@@ -155,6 +155,6 @@ gt track -p main
 ## Related Skills
 
 - **`graphite`** — primary skill for Graphite after branching: stacks, `gt submit`, `gt restack`, PR body/title workflow, troubleshooting. Path: `.agent/skills/graphite/SKILL.md`
-- **`ryans-anet-ticket-branch`** — Linear-ticket-driven branch creation flow
+- **`ryans-anet-ticket-branch`** — Jira-ticket-driven branch creation flow
 - **`ryans-anet-pr`** — opening draft PRs after branch work (often after **`graphite`** submit)
 - **`anet-ticket-branch-pr`** — combined ticket → branch → PR flow

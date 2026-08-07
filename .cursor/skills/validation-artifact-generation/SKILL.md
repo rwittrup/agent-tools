@@ -6,18 +6,18 @@ description: Validation-before-implementation—plan, tests with minimal compile
 # Skill: Validation Artifact Generator
 
 ## Purpose
-Produce a complete, runnable validation artifact from a Linear ticket **before** the real implementation lands. The artifact is the TDD contract — fail first on red, pass when the feature is done.
+Produce a complete, runnable validation artifact from a Jira ticket **before** the real implementation lands. The artifact is the TDD contract — fail first on red, pass when the feature is done.
 
 ---
 
 ## Workflow order
 
-1. **Validation plan** — §1; maps ACs to checks. Persist **`validation-plan.md`** under **`.artifacts/{LINEAR_TICKET}/`** when the plan is ready (see **Artifact storage**).
+1. **Validation plan** — §1; maps ACs to checks. Persist **`validation-plan.md`** under **`.artifacts/{JIRA_TICKET}/`** when the plan is ready (see **Artifact storage**).
 2. **Tests from the plan** — §2; write all tests; production code only **minimal stubs** so the project compiles/builds (not a working feature).
-3. **Artifact** — §4; one entrypoint that runs tests **plus** any other validation commands the plan needs. Mirror that entrypoint into **`.artifacts/{LINEAR_TICKET}/`** as **`validation-artifact.sh`** or **`validation-artifact.md`**.
+3. **Artifact** — §4; one entrypoint that runs tests **plus** any other validation commands the plan needs. Mirror that entrypoint into **`.artifacts/{JIRA_TICKET}/`** as **`validation-artifact.sh`** or **`validation-artifact.md`**.
 4. **Red + pause** — Run the artifact, confirm expected failures, **stop** for human review (they may re-run the artifact).  
    **Exception:** If the plan is **unit-test-only** (see below), skip pre-implementation artifact run and pause; implement with commits as appropriate, then run artifact + unit tests at the end.
-5. **Implement** until green; **small, logical commits** per commit-formatting—each commit pairs tests with the behavior they assert; **never** `git add` or commit `.artifacts/`. When green, add **`implementation-summary.md`** under **`.artifacts/{LINEAR_TICKET}/`** (local only).
+5. **Implement** until green; **small, logical commits** per commit-formatting—each commit pairs tests with the behavior they assert; **never** `git add` or commit `.artifacts/`. When green, add **`implementation-summary.md`** under **`.artifacts/{JIRA_TICKET}/`** (local only).
 
 ---
 
@@ -35,14 +35,14 @@ If the validation plan consists **solely** of unit tests (no integration tests, 
 ---
 
 ## Inputs
-- Linear ticket (full schema)
+- Jira ticket (full schema)
 - Component layer: `call-handler` (Go) | `ruby-api` (Ruby) | `frontend` (React)
 
 ---
 
 ## Artifact storage (required)
 
-At the **repository root**, maintain a durable copy of validation materials under **`.artifacts/{LINEAR_TICKET}/`** using the Linear issue key (e.g. `ANET-2636`). Create the directory if it does not exist.
+At the **repository root**, maintain a durable copy of validation materials under **`.artifacts/{JIRA_TICKET}/`** using the Jira issue key (e.g. `ANET-2636`). Create the directory if it does not exist.
 
 | File | Contents |
 |------|----------|
@@ -110,7 +110,7 @@ When several steps are needed, consolidate into **one** deliverable a human or a
 - A **single fenced block** of shell lines meant to be run in order (copy-paste friendly), or
 - One existing `just` invocation if a single recipe covers everything
 
-Regardless of where the script lives in-repo, mirror the **same** entrypoint under **`.artifacts/{LINEAR_TICKET}/`** per **Artifact storage** (`validation-artifact.sh` or `validation-artifact.md`).
+Regardless of where the script lives in-repo, mirror the **same** entrypoint under **`.artifacts/{JIRA_TICKET}/`** per **Artifact storage** (`validation-artifact.sh` or `validation-artifact.md`).
 
 **Ruby API example** (reuse `dc-exec`; adjust paths to match the ticket):
 

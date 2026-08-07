@@ -26,7 +26,7 @@ The 50/72 rule applies **only** to `git commit` messages. PR descriptions use th
 - Blank line between subject and body
 - Explain **what** changed and **why** — not how (the diff shows how)
 - Wrap at 72 characters — hard wrap, not soft
-- **ANET ticket** line appears in the body **before** any **signature** (e.g. `Signed-off-by`, `Co-authored-by`, `Made-with:`) as **plain text**: `ANET-1234 - {Linear title}` (see [ANET ticket in the body](#anet-ticket-in-the-body-plain-text))
+- **ANET ticket** line appears in the body **before** any **signature** (e.g. `Signed-off-by`, `Co-authored-by`, `Made-with:`) as **plain text**: `ANET-1234 - {Jira summary}` (see [ANET ticket in the body](#anet-ticket-in-the-body-plain-text))
 
 ---
 
@@ -87,7 +87,7 @@ These show up when the model treats the commit message as a mini PR
 description. Avoid them.
 
 - **Ticket in the subject only.** Do not use `[ANET-1234] …` in the
-  subject as a substitute for the body line `ANET-1234 - {title}`.
+  subject as a substitute for the body line `ANET-1234 - {summary}`.
   Bracket IDs burn the 50-character subject budget and skip the
   autolinked body format this skill requires before trailers.
 - **Inventory bodies.** Do not list every new file, export, styled
@@ -113,7 +113,7 @@ explicitly asked for them in the message.
 - Subject ≤ 50 characters, imperative, no trailing period.
 - Body lines ≤ 72 characters, hard-wrapped.
 - Body explains what/why, not file-by-file how.
-- Exactly one `ANET-1234 - {Linear title}` line (from `get_issue`) after
+- Exactly one `ANET-1234 - {Jira summary}` line (from `getJiraIssue`) after
   the narrative and before any trailer (`Made-with:`, `Co-authored-by:`,
   etc.).
 - No long inventories: if you are typing lists of symbols, stop.
@@ -128,11 +128,11 @@ When committing, produce the full commit message before running `git commit`. Pr
 
 Place the ticket **in the body**, **after** the descriptive lines and **before** any **signature** block (Git trailers such as `Signed-off-by:` or `Co-authored-by:`, or footers like `Made-with:`).
 
-This repo’s GitHub is integrated with Linear: the issue id in the commit body is **autolinked**. You do **not** need markdown links, raw URLs, or HTML—use a single plain-text line.
+This repo’s GitHub is integrated with Jira: the issue key in the commit body is **autolinked**. You do **not** need markdown links, raw URLs, or HTML—use a single plain-text line.
 
-**Shape:** `{identifier} - {title}`
+**Shape:** `{key} - {summary}`
 
-Use **`identifier`** and **`title`** from Linear **`get_issue`** (same wording as the ticket title).
+Use **`key`** and **`summary`** from Jira **`getJiraIssue`** (same wording as the ticket summary).
 
 **Example:**
 

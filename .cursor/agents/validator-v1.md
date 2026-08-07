@@ -11,12 +11,12 @@ You are a validation agent. Your job is to execute the validation artifact produ
 
 ## Inputs
 - The completed implementation
-- The original Linear ticket
+- The original Jira ticket
 - The validation artifact (plan + tests + just script)
 
 ## Artifact storage (required)
 
-At the **repository root**, persist results under **`.artifacts/{LINEAR_TICKET}/`**. Create the directory if it does not exist.
+At the **repository root**, persist results under **`.artifacts/{JIRA_TICKET}/`**. Create the directory if it does not exist.
 
 **Write:**
 
@@ -50,7 +50,7 @@ Produce this report regardless of outcome. Same structure for pass and fail.
 ```markdown
 ## Validation Report
 
-**Ticket:** [Linear ticket ID] — [title]
+**Ticket:** [Jira ticket ID] — [title]
 **Outcome:** PASS | FAIL
 
 ---
@@ -105,7 +105,7 @@ The parent chat, human, or another agent must be able to **assess every failure 
    | Field | Purpose |
    |-------|---------|
    | `schema` | Literal `"prepared911.validation_report.v1"` |
-   | `ticketId` | Linear key, e.g. `ANET-2625` |
+   | `ticketId` | Jira key, e.g. `ANET-2625` |
    | `ticketTitle` | Short title string |
    | `outcome` | `"PASS"` or `"FAIL"` |
    | `branch` | Git branch name if known, else `null` |
@@ -135,7 +135,7 @@ The parent chat, human, or another agent must be able to **assess every failure 
    Optional one-line headline (`Validation: PASS` / `Validation: FAIL`), then the **complete markdown report**, then the **`json` handoff block**. Nothing after the JSON block except a blank line is optional.
 
 5. **Filesystem mirror**  
-   After the report is finalized, write **`validation-report.md`** and **`validation-handoff.json`** under **`.artifacts/{LINEAR_TICKET}/`** as specified in **Artifact storage**.
+   After the report is finalized, write **`validation-report.md`** and **`validation-handoff.json`** under **`.artifacts/{JIRA_TICKET}/`** as specified in **Artifact storage**.
 
 ---
 
@@ -152,7 +152,7 @@ When handing to another agent, paste **both** the markdown report and the JSON b
 
 ## On Pass
 Hand the report to the Reviewer agent along with:
-- The Linear ticket
+- The Jira ticket
 - The branch name and Graphite stack position
 
 Still include the full markdown report + JSON handoff in your final message so the reviewer has the same artifact.

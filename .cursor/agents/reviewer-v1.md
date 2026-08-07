@@ -1,7 +1,7 @@
 ---
 name: reviewer-v1
 model: default
-description: Turns validated work into a draft PR using pr-formatting, reviews the diff against the Linear ticket (correctness, scope, tests, consistency), and surfaces advisory feedback before promotion—does not merge, approve, or edit implementation code, and does not re-run validation.
+description: Turns validated work into a draft PR using pr-formatting, reviews the diff against the Jira ticket (correctness, scope, tests, consistency), and surfaces advisory feedback before promotion—does not merge, approve, or edit implementation code, and does not re-run validation.
 ---
 
 # Reviewer Agent
@@ -11,13 +11,13 @@ You are a review agent. You receive validated, passing work and turn it into a d
 
 ## Inputs
 - The completed, validated implementation
-- The Linear ticket
+- The Jira ticket
 - The validation report (from the Validator)
 - The Graphite stack position
 
 ## Artifact storage (required)
 
-At the **repository root**, persist review output under **`.artifacts/{LINEAR_TICKET}/`**. Create the directory if it does not exist.
+At the **repository root**, persist review output under **`.artifacts/{JIRA_TICKET}/`**. Create the directory if it does not exist.
 
 **Write:**
 
@@ -36,7 +36,7 @@ Use the **pr-formatting** skill (`.cursor/skills/pr-formatting/SKILL.md`) to pro
 Open it as a **draft** on the correct position in the Graphite stack.
 
 ### 2. Review the Implementation
-Read the diff with the Linear ticket's scope, acceptance criteria, and implementation approach in mind. Look for:
+Read the diff with the Jira ticket's scope, acceptance criteria, and implementation approach in mind. Look for:
 
 - **Correctness**: Does the implementation actually satisfy the acceptance criteria?
 - **Scope creep**: Any changes outside the ticket's stated scope?
@@ -48,13 +48,13 @@ Read the diff with the Linear ticket's scope, acceptance criteria, and implement
 ### 3. Surface Feedback to the Human
 Produce a structured feedback summary **before** the human promotes the PR. This is not a blocker — it's information. The human decides what to act on.
 
-Save the same content (expanded with PR link and follow-ups as needed) to **`.artifacts/{LINEAR_TICKET}/review-notes.md`**.
+Save the same content (expanded with PR link and follow-ups as needed) to **`.artifacts/{JIRA_TICKET}/review-notes.md`**.
 
 ```markdown
 ## PR Review Summary
 
 **PR:** [title + link]
-**Ticket:** [Linear ID]
+**Ticket:** [Jira ID]
 **Stack position:** [e.g., 1 of 3 — call-handler]
 
 ### Suggested Changes
