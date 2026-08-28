@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Sync local .cursor/skills and .cursor/agents into Cursor/Claude agent paths via symlinks.
-# For each entry under .cursor/skills/ and .cursor/agents/, ensures a symlink exists in the
-# corresponding home directories pointing at this repo. Idempotent: correct
+# Sync local .cursor/skills, .cursor/agents, and .cursor/rules into Cursor/Claude
+# paths via symlinks. For each entry under those dirs, ensures a symlink exists in
+# the corresponding home directories pointing at this repo. Idempotent: correct
 # symlinks are left unchanged; missing symlinks are created.
 #
 # Symlinks that point at the wrong target are removed and recreated.
@@ -19,14 +19,19 @@ skipped_count=0
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILLS_SRC="${REPO_ROOT}/.cursor/skills"
 AGENTS_SRC="${REPO_ROOT}/.cursor/agents"
+RULES_SRC="${REPO_ROOT}/.cursor/rules"
 
 SKILL_DEST_DIRS=(
   "${HOME}/.agents/skills"
   "${HOME}/.cursor/skills"
+  "${HOME}/.claude/skills"
 )
 AGENT_DEST_DIRS=(
   "${HOME}/.cursor/agents"
   "${HOME}/.claude/agents"
+)
+RULE_DEST_DIRS=(
+  "${HOME}/.claude/rules"
 )
 
 die() {
@@ -44,8 +49,9 @@ usage() {
 Usage: sync-skills-and-agents.sh [-v|--verbose]
 
   Sources (repo root = directory containing this script):
-    .cursor/skills/*  →  ~/.agents/skills/<name>, ~/.cursor/skills/<name>
+    .cursor/skills/*  →  ~/.agents/skills/<name>, ~/.cursor/skills/<name>, ~/.claude/skills/<name>
     .cursor/agents/*  →  ~/.cursor/agents/<name>, ~/.claude/agents/<name>
+    .cursor/rules/*   →  ~/.claude/rules/<name>
 
   Wrong-target symlinks are replaced automatically (same name).
 
@@ -136,9 +142,10 @@ main() {
 
   [[ -d "$SKILLS_SRC" ]] || die "missing directory: $SKILLS_SRC"
   [[ -d "$AGENTS_SRC" ]] || die "missing directory: $AGENTS_SRC"
+  [[ -d "$RULES_SRC" ]] || die "missing directory: $RULES_SRC"
 
   local d
-  for d in "${SKILL_DEST_DIRS[@]}" "${AGENT_DEST_DIRS[@]}"; do
+  for d in "${SKILL_DEST_DIRS[@]}" "${AGENT_DEST_DIRS[@]}" "${RULE_DEST_DIRS[@]}"; do
     ensure_dir "$d"
   done
 
@@ -157,6 +164,14 @@ main() {
     name="$(basename "$path")"
     [[ "$name" == "." || "$name" == ".." ]] && continue
     for d in "${AGENT_DEST_DIRS[@]}"; do
+      link_one "$d" "$name" "$path"
+    done
+  done
+
+  for path in "${RULES_SRC}"/*; do
+    name="$(basename "$path")"
+    [[ "$name" == "." || "$name" == ".." ]] && continue
+    for d in "${RULE_DEST_DIRS[@]}"; do
       link_one "$d" "$name" "$path"
     done
   done
