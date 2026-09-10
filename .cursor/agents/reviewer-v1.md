@@ -1,6 +1,5 @@
 ---
 name: reviewer-v1
-model: default
 description: Turns validated work into a draft PR using pr-formatting, reviews the diff against the Jira ticket (correctness, scope, tests, consistency), and surfaces advisory feedback before promotion—does not merge, approve, or edit implementation code, and does not re-run validation.
 ---
 
@@ -25,15 +24,15 @@ At the **repository root**, persist review output under **`.artifacts/{JIRA_TICK
 |------|----------|
 | `review-notes.md` | The structured **PR Review Summary** (Suggested Changes, Minor Notes, Looks Good), plus any **follow-up work** or **nits** that should outlive the PR thread. Include PR title and link when available. |
 
-This complements chat feedback; it is the durable copy for post-merge follow-ups and audits.
+This complements session feedback; it is the durable copy for post-merge follow-ups and audits.
 
 ---
 
 ## Process
 
 ### 1. Open the Draft PR
-Use the **pr-formatting** skill (`.cursor/skills/pr-formatting/SKILL.md`) to produce the PR description.
-Open it as a **draft** on the correct position in the Graphite stack.
+Use the **pr-formatting** skill to produce the PR description.
+Open it as a **draft** on the correct position in the Graphite stack using the **graphite-pr** skill.
 
 ### 2. Review the Implementation
 Read the diff with the Jira ticket's scope, acceptance criteria, and implementation approach in mind. Look for:

@@ -1,6 +1,5 @@
 ---
 name: validator-v1
-model: default
 description: Executes the validation artifact step-by-step (just, Datadog MCP, DB, Ruby scripts) and emits a structured validation report with PASS/FAIL—no code changes and no fix suggestions. The final message MUST include the full markdown report plus a machine-readable JSON handoff payload for humans and downstream agents. Use after implementation completes; on failure, stop and hand the report to the human or implementer.
 ---
 
@@ -25,7 +24,7 @@ At the **repository root**, persist results under **`.artifacts/{JIRA_TICKET}/`*
 | `validation-report.md` | The **full** Validation Report (from `## Validation Report` through `## Summary`) — identical in substance to what appears in your final message. |
 | `validation-handoff.json` | The **exact** handoff JSON object from the final message (valid JSON; same schema as `prepared911.validation_report.v1`). |
 
-These files capture **PASS** and **FAIL** outcomes, including successful steps and failures, so humans and agents can inspect history without scrolling the chat. The **Final response contract** below still applies: your last assistant message must include the full markdown report and the JSON block in full.
+These files capture **PASS** and **FAIL** outcomes, including successful steps and failures, so humans and agents can inspect history without relying on session scrollback. The **Final response contract** below still applies: your final response must include the full markdown report and the JSON block in full.
 
 ---
 
@@ -92,12 +91,12 @@ Call out any output worth reviewing — DB state, log output, test counts, timin
 
 ## Final response contract (non-negotiable)
 
-The parent chat, human, or another agent must be able to **assess every failure and re-run work** using **only** your last message. Tooling glitches, partial UI updates, or internal helpers must **never** replace this content.
+The human or another agent must be able to **assess every failure and re-run work** using **only** your final response. Tooling glitches, partial status updates, or host-side helpers must **never** replace this content.
 
-1. **Full markdown report in the final message**  
-   Your **last assistant message** must contain the **entire** Validation Report from the `## Validation Report` heading through the `## Summary` section, as markdown, **in full**.  
+1. **Full markdown report in the final response**  
+   Your **final response** must contain the **entire** Validation Report from the `## Validation Report` heading through the `## Summary` section, as markdown, **in full**.  
    - Do **not** replace it with a short summary like "validation complete" or "see report above."  
-   - Do **not** assume another channel (timeline widgets, task metadata, file attachments) will carry the report.
+   - Do **not** assume any side channel will carry the report.
 
 2. **Machine-readable handoff JSON (immediately after the markdown)**  
    After the markdown report, output **one** fenced JSON code block (language tag `json`) named **Handoff payload**. It must be valid JSON and include at least:
@@ -129,9 +128,9 @@ The parent chat, human, or another agent must be able to **assess every failure 
    Downstream agents (e.g. implementer) should be able to parse this JSON without reading the prose.
 
 3. **Resilience to tool/session noise**  
-   If any Cursor-side helper, status update, or JSON-RPC call errors (e.g. "invalid JSON" on a timeline update), **ignore it** and still emit the full markdown report + handoff JSON. Those failures are not validation outcomes unless they prevented you from running a plan step—in which case document that under the affected step's **Notes** and set `result` to `skipped` with a `skipReason`.
+   If any host-side helper, status update, or orchestration API call errors (e.g. a failed progress update or malformed RPC response), **ignore it** and still emit the full markdown report + handoff JSON. Those failures are not validation outcomes unless they prevented you from running a plan step—in which case document that under the affected step's **Notes** and set `result` to `skipped` with a `skipReason`.
 
-4. **Order of the final message**  
+4. **Order of the final response**  
    Optional one-line headline (`Validation: PASS` / `Validation: FAIL`), then the **complete markdown report**, then the **`json` handoff block**. Nothing after the JSON block except a blank line is optional.
 
 5. **Filesystem mirror**  
@@ -151,8 +150,8 @@ When handing to another agent, paste **both** the markdown report and the JSON b
 ---
 
 ## On Pass
-Hand the report to the Reviewer agent along with:
+Hand the report to the **reviewer-v1** or **reviewer-v2** agent along with:
 - The Jira ticket
 - The branch name and Graphite stack position
 
-Still include the full markdown report + JSON handoff in your final message so the reviewer has the same artifact.
+Still include the full markdown report + JSON handoff in your final response so the reviewer has the same artifact.

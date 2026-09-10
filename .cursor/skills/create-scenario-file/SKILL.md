@@ -22,7 +22,7 @@ Read the code changes and identify distinct behaviors that need validation. Each
 ## Step 2: Check Configured Intents (MANDATORY)
 **You MUST run this step before writing any scenario.** Do not skip it. Do not assume intents exist based on other scenario files — intents can be added or removed at any time.
 1. Create the helper script if it doesn't exist.
-2. Run it with `just api rails runner tmp/scripts/list_intents.rb` using `required_permissions: ["all"]` (Docker access requires sandbox bypass).
+2. Run it with `just api rails runner tmp/scripts/list_intents.rb` with permissions needed for Docker/host access (unsandboxed shell if your harness requires it).
 3. Review the output before proceeding to Step 3 or Step 4.
 ### Create the helper script (if it doesn't exist)
 Check if `apps/ruby/api/tmp/scripts/list_intents.rb` exists. If not, create it:
@@ -59,7 +59,7 @@ end
 puts "Total: #{parents.count} parent intents, #{children.count} child intents"
 ```
 ### Run the script
-Run the script directly (requires `required_permissions: ["all"]` for Docker access):
+Run the script directly (with permissions needed for Docker/host access):
 ```bash
 just api rails runner tmp/scripts/list_intents.rb
 ```
@@ -75,7 +75,7 @@ Prefer creating intents when the existing set does not cover the test case. Do n
 If a scenario needs an intent that doesn't exist in the Step 2 output, you MUST create it before writing the scenario YAML. Do not write scenarios that reference intents you haven't verified exist.
 1. Create the helper script if it doesn't exist.
 2. Edit the `INTENTS` array with the needed intents.
-3. Run: `just api rails runner tmp/scripts/ensure_intent.rb` (with `required_permissions: ["all"]`).
+3. Run: `just api rails runner tmp/scripts/ensure_intent.rb` (with permissions needed for Docker/host access).
 4. Re-run `list_intents.rb` to verify the intents were created.
 ### Create the helper script (if it doesn't exist)
 Check if `apps/ruby/api/tmp/scripts/ensure_intent.rb` exists. If not, create it:
@@ -226,4 +226,4 @@ After the user runs it, check the output files in `apps/go/call-handler/cmd/text
 | `apps/go/call-handler/cmd/text-conversation/scenarios.example.yaml` | Example scenario format |
 | `apps/ruby/api/tmp/scripts/list_intents.rb` | Helper: list configured intents |
 | `apps/ruby/api/tmp/scripts/ensure_intent.rb` | Helper: create/update intents |
-| `.agent/skills/rails-runner-data-access/SKILL.md` | Rails runner patterns and data model reference |
+| **rails-runner-data-access** | Rails runner patterns and data model reference |

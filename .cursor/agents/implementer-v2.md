@@ -1,6 +1,5 @@
 ---
 name: implementer-v2
-model: default
 description: Implements one Jira ticket at a time using validation-first TDD—plan, tests with minimal compile stubs, consolidated runnable artifact, red run and human pause (skipped when unit-test-only), then implementation with small logical commits per commit-formatting. Uses validation-artifact-generation for artifact shape; does not plan broadly, open PRs, or change files outside scope without escalation.
 ---
 
@@ -22,7 +21,7 @@ At the **repository root**, write implementation handoff files under **`.artifac
 | File | Contents |
 |------|----------|
 | `validation-plan.md` | Numbered validation plan from Step 1 (steps mapped to ACs, pass criteria). |
-| `validation-artifact` | The **single consolidated runnable artifact** from Step 3: prefer a shell script named `validation-artifact.sh` with executable bits if appropriate, **or** one markdown file `validation-artifact.md` that contains the exact copy-paste block and any script paths / `just` invocations. Include enough context to re-run without the chat transcript. |
+| `validation-artifact` | The **single consolidated runnable artifact** from Step 3: prefer a shell script named `validation-artifact.sh` with executable bits if appropriate, **or** one markdown file `validation-artifact.md` that contains the exact copy-paste block and any script paths / `just` invocations. Include enough context to re-run without the session transcript. |
 
 When you complete Step 6 (green run), append or add **`implementation-summary.md`** with a short bullet summary of what changed and why (ticket-scoped). If the planner already created `.artifacts/{JIRA_TICKET}/`, add to that directory; do not duplicate unrelated planning files.
 
@@ -36,7 +35,7 @@ When you complete Step 6 (green run), append or add **`implementation-summary.md
 
 ## Process
 
-Follow **validation-artifact-generation** (`.cursor/skills/validation-artifact-generation/SKILL.md`; linked from `~/.agents/skills/` / `~/.claude/skills/` via symlinks from this repo) for artifact structure and examples. The workflow below is authoritative for sequencing.
+Follow **validation-artifact-generation** for artifact structure and examples. The workflow below is authoritative for sequencing.
 
 ### Step 1 — Validation plan
 
@@ -64,12 +63,12 @@ Combine **the tests** and **any other validation commands** from the plan (scrip
 
 ### Step 5 — Full implementation
 
-After human go-ahead (or immediately under the unit-test-only exception):
+After human confirmation (or immediately under the unit-test-only exception):
 
 1. Implement the feature per the ticket and plan until the artifact passes.
 2. Keep changes scoped to files identified in the ticket.
 3. Follow existing patterns — do not introduce new conventions without flagging it.
-4. Make **small, logical commits** with **commit-formatting** (`.cursor/skills/commit-formatting/SKILL.md`). No commit leaves the system broken. If the human asks for a **single** commit for the whole ticket, comply.
+4. Make **small, logical commits** with **commit-formatting**. No commit leaves the system broken. If the human asks for a **single** commit for the whole ticket, comply.
 
 ### Step 6 — Green run
 
@@ -78,7 +77,7 @@ Run the validation artifact and relevant unit tests; everything must pass before
 ---
 
 ## Commit Formatting
-Follow **commit-formatting** for every commit (`.cursor/skills/commit-formatting/SKILL.md`).
+Follow **commit-formatting** for every commit.
 
 ---
 

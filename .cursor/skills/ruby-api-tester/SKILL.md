@@ -5,8 +5,6 @@ description: Exercise the local Rails API (GraphQL and HTTP) with a real OAuth t
 
 # Ruby API tester (local GraphQL / HTTP)
 
-**Canonical path:** `.cursor/skills/ruby-api-tester/SKILL.md` (this repo). Symlinks: `~/.agents/skills/ruby-api-tester`, `~/.cursor/skills/ruby-api-tester`, and `~/.claude/skills/ruby-api-tester` → this directory (same pattern as `commit-formatting`).
-
 Use this workflow to run **authenticated** requests against the **Prepared Rails API** (`apps/ruby/api/`) the same way the dispatch UI does: **Doorkeeper Bearer token** + `POST /graphql`. This validates what GraphQL resolvers return from the database without guessing from models alone.
 
 ## When to use
@@ -149,7 +147,7 @@ curl -sS -X POST "$GRAPHQL_URL" \
 
 ## Rails runner discipline
 
-Do **not** pass long Ruby strings to `just api rails runner "…"` from the shell (quoting breaks). Per `apps/ruby/AGENTS.md` / **ryans-rails** skill:
+Do **not** pass long Ruby strings to `just api rails runner "…"` from the shell (quoting breaks). Use the **ryans-rails** skill:
 
 - Put ad-hoc code in `apps/ruby/api/tmp/*.rb`
 - Run: `just api rails runner tmp/your-script.rb`
@@ -177,7 +175,7 @@ Do **not** pass long Ruby strings to `just api rails runner "…"` from the shel
 
 | Path | Purpose |
 |------|---------|
-| `.cursor/skills/ruby-api-tester/SKILL.md` | This skill (edit here); home skills trees symlink this folder |
+| **ruby-api-tester** | This skill |
 | `apps/ruby/api/tmp/rails-runner-mint-oauth-access-token.rb` | Print one-line OAuth token for local API testing |
 | `dev/scripts/graphql_anet_chatroom_transcript.py` | Example: GraphQL timeline transcript dump |
 | `apps/ruby/api/app/controllers/graphql_controller.rb` | Auth gating for `/graphql` |

@@ -1,0 +1,17 @@
+---
+description: Reference skills and agents by name only — harnesses map names to paths
+alwaysApply: true
+---
+
+# Skill and agent references
+
+Reference skills and agents **by name only** (e.g. **commit-formatting**, **implementer-v2**, **pr-reviewer-high-level**).
+
+Do **not** hardcode:
+
+- Filesystem paths to skills or agents
+- Harness-specific roots (`.cursor/`, `.agent/`, `~/.cursor/skills/`, etc.)
+- Slash-command skill invocations (`/commit-formatting`)
+- Harness-specific frontmatter (`model`, `allowed-tools`, `disable-model-invocation`, etc.) — keep only portable `name` and `description` fields
+
+Each harness resolves names to its own skill and agent locations, and applies its own model, tool, and invocation settings.

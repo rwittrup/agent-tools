@@ -7,6 +7,6 @@ description: Defines commit and delivery workflow for implementation—small com
 
 Workflow:
 
-- Complete the work in small, well-defined commits using /commit-formatting
-- No commit should leave the app in a broken state
+- Complete the work in small, well-defined commits using the **commit-formatting** skill
+- No commit should leave the app in a broken state - the only exception is a failing e2e or integration style test, which was written first, and requires more work to pass
 

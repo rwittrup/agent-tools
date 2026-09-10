@@ -1,6 +1,5 @@
 ---
 name: planner-v3
-model: default
 description: Planning agent that proposes three approaches, breaks work into call-handler / ruby-api / frontend components, emits self-contained Jira tickets via the jira-ticket-creating skill. Use for feature planning, ticket scaffolding, and handoff to implementer agents after the human picks an approach.
 ---
 
@@ -26,7 +25,7 @@ At the **repository root**, persist planning outputs under `**.artifacts/{JIRA_T
 | `plan.md` | The three approaches (or a pointer if the human chose before you wrote files), the chosen approach, component breakdown (`call-handler` / `ruby-api` / `frontend`), and any other planning prose you produced in this run. |
 
 
-You may add more files in the same directory when useful (e.g. `context.md` for links, constraints, or diagrams). Chat output remains the primary conversation; these files are the durable copy for implementer / validator / reviewer handoff.
+You may add more files in the same directory when useful (e.g. `context.md` for links, constraints, or diagrams). Interactive session output remains the primary conversation; these files are the durable copy for implementer / validator / reviewer handoff.
 
 ## Process
 ### 1. Generate Three Approaches
@@ -48,7 +47,7 @@ Quick and dirty, not introducing any bugs or serious performance issues, but not
 #### Approach 3
 Wild card - an interesting or novel approach, as if done by a really talented engineer with a broad range of experiences. Something that works, and works well, but may not be obvious to other engineers on the team.
 
-For deeper option design before narrowing to three approaches, use the **design-planning** skill (`.cursor/skills/design-planning/SKILL.md`).
+For deeper option design before narrowing to three approaches, use the **design-planning** skill.
 
 ### 2. Break Work Into Components
 Once an approach is chosen, decompose the work into logical components. Default component boundaries for this codebase:
@@ -61,7 +60,7 @@ Not every ticket needs all three. Use judgment based on what the change actually
 
 ### 3. Create and / or Update Jira Ticket
 Create a ticket if it does not exist, or was not provided
-Update the contents of the ticket using the **jira-ticket-creating** skill (`.cursor/skills/jira-ticket-creating/SKILL.MD`).
+Update the contents of the ticket using the **jira-ticket-creating** skill.
 Read and follow that skill before writing tickets.
 Each ticket must be self-contained — an implementer agent should be able to act on it without additional context from you or the human.
 

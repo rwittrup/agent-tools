@@ -31,6 +31,7 @@ AGENT_DEST_DIRS=(
   "${HOME}/.claude/agents"
 )
 RULE_DEST_DIRS=(
+  "${HOME}/.cursor/rules"
   "${HOME}/.claude/rules"
 )
 
@@ -51,7 +52,7 @@ Usage: sync-skills-and-agents.sh [-v|--verbose]
   Sources (repo root = directory containing this script):
     .cursor/skills/*  →  ~/.agents/skills/<name>, ~/.cursor/skills/<name>, ~/.claude/skills/<name>
     .cursor/agents/*  →  ~/.cursor/agents/<name>, ~/.claude/agents/<name>
-    .cursor/rules/*   →  ~/.claude/rules/<name>
+    .cursor/rules/*   →  ~/.cursor/rules/<name>, ~/.claude/rules/<name>
 
   Wrong-target symlinks are replaced automatically (same name).
 

@@ -17,7 +17,7 @@ Produce a complete, runnable validation artifact from a Jira ticket **before** t
 3. **Artifact** — §4; one entrypoint that runs tests **plus** any other validation commands the plan needs. Mirror that entrypoint into **`.artifacts/{JIRA_TICKET}/`** as **`validation-artifact.sh`** or **`validation-artifact.md`**.
 4. **Red + pause** — Run the artifact, confirm expected failures, **stop** for human review (they may re-run the artifact).  
    **Exception:** If the plan is **unit-test-only** (see below), skip pre-implementation artifact run and pause; implement with commits as appropriate, then run artifact + unit tests at the end.
-5. **Implement** until green; **small, logical commits** per commit-formatting—each commit pairs tests with the behavior they assert; **never** `git add` or commit `.artifacts/`. When green, add **`implementation-summary.md`** under **`.artifacts/{JIRA_TICKET}/`** (local only).
+5. **Implement** until green; **small, logical commits** per **commit-formatting**—each commit pairs tests with the behavior they assert; **never** `git add` or commit `.artifacts/`. When green, add **`implementation-summary.md`** under **`.artifacts/{JIRA_TICKET}/`** (local only).
 
 ---
 
@@ -47,7 +47,7 @@ At the **repository root**, maintain a durable copy of validation materials unde
 | File | Contents |
 |------|----------|
 | `validation-plan.md` | The numbered plan from §1 (steps, AC mapping, tools, pass criteria). |
-| `validation-artifact.sh` **or** `validation-artifact.md` | The **single** consolidated runnable artifact from §4: a small script (executable when appropriate) **or** one markdown file with the exact copy-paste shell block, script paths, and `just` invocations—enough to re-run without the chat transcript. |
+| `validation-artifact.sh` **or** `validation-artifact.md` | The **single** consolidated runnable artifact from §4: a small script (executable when appropriate) **or** one markdown file with the exact copy-paste shell block, script paths, and `just` invocations—enough to re-run without the session transcript. |
 | `implementation-summary.md` | After implementation is complete and the artifact is green: short bullet summary of what changed and why (scoped to this ticket). |
 
 If the canonical runnable script lives under **`dev/scripts/`** or next to the feature, keep it there for CI/repo conventions and **also** copy or reference it from **`validation-artifact.md`** under **`.artifacts/`** so the entrypoint is obvious.

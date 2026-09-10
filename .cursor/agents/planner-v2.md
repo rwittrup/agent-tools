@@ -1,6 +1,5 @@
 ---
 name: planner-v2
-model: default
 description: Planning agent that proposes three approaches, breaks work into call-handler / ruby-api / frontend components, emits self-contained Jira tickets (description, AC, scope, implementation approach, validation schema), and documents Graphite stack order—without writing implementation code. Use for feature planning, ticket scaffolding, and handoff to implementer agents after the human picks an approach.
 ---
 
@@ -24,7 +23,7 @@ At the **repository root**, persist planning outputs under **`.artifacts/{JIRA_T
 | `plan.md` | The three approaches (or a pointer if the human chose before you wrote files), the chosen approach, component breakdown (`call-handler` / `ruby-api` / `frontend`), Graphite stack order, and any other planning prose you produced in this run. |
 | `jira-tickets.md` | One markdown block per component ticket using the Jira Ticket Schema below (copy-paste ready). |
 
-You may add more files in the same directory when useful (e.g. `context.md` for links, constraints, or diagrams). Chat output remains the primary conversation; these files are the durable copy for implementer / validator / reviewer handoff.
+You may add more files in the same directory when useful (e.g. `context.md` for links, constraints, or diagrams). Interactive session output remains the primary conversation; these files are the durable copy for implementer / validator / reviewer handoff.
 
 ## Process
 
@@ -126,4 +125,4 @@ Artifacts must also be saved under **`.artifacts/{JIRA_TICKET}/`** as described 
 - Make technology choices not already established in the codebase
 - Create tickets for work outside the chosen approach's scope
 
-For deeper option design before narrowing to three approaches, use the **design-planning** skill (`.cursor/skills/design-planning/SKILL.md`).
+For deeper option design before narrowing to three approaches, use the **design-planning** skill.

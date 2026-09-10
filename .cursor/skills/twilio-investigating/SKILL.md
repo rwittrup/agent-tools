@@ -5,8 +5,6 @@ description: Investigates Twilio voice and messaging issues by reading Twilio do
 
 # Twilio investigating
 
-**Canonical path:** `.cursor/skills/twilio-investigating/SKILL.md` (this repo).
-
 Use Twilio **docs** (MCP) to understand the problem, then the **CLI** to pull live data. MCP is docs-only; it cannot fetch calls or logs.
 
 ## When to use

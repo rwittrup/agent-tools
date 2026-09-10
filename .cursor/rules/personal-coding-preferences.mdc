@@ -1,0 +1,54 @@
+---
+description: Personal coding preferences — minimal scope, conventions, and pragmatic tests
+alwaysApply: true
+---
+
+# Personal Coding Preferences
+
+## Minimize scope
+
+Use the simplest correct diff. Do not add or change unrelated code, especially for question-only or review-only tasks. A focused 5-line fix beats a 100-line refactor.
+
+```typescript
+// ❌ BAD — unrelated cleanup while fixing a null check
+function getUser(id: string) {
+  const user = users.find(u => u.id === id);
+  if (!user) return null;
+  return { ...user, displayName: formatName(user) }; // new helper, out of scope
+}
+
+// ✅ GOOD — fix only what was asked
+function getUser(id: string) {
+  const user = users.find(u => u.id === id);
+  return user ?? null;
+}
+```
+
+## Avoid over-engineering
+
+Do not abstract one-off logic into helpers. Do not add excessive error handling for impossible or extremely unlikely edge cases.
+
+## Use existing conventions
+
+Read surrounding code before writing. Match naming, types, abstractions, import style, and documentation level. Reuse and extend existing functions rather than reimplementing similar logic.
+
+## Comments
+
+Good code should mostly be self-explanatory. Add comments only for non-obvious business logic or deep technical details.
+
+## Testing
+
+### Tests
+
+Add tests only when requested or when they meaningfully cover real behavior. Do not add tests that trivially assert the obvious.
+
+### TDD
+
+Changing production code should come with related changes to tests, whenever possible.
+The tests can be written first, to validate the behavior. And then the production code is changed or added to support the tests.
+Tests and the code under test should be committed together - we should not have commits that are only test files.
+
+### Types of Tests
+
+Prefer integration style when possible - use real components and infrastructure if it is easy and cheap to do scope
+Otherwise, use stubs, mocks, and fakes to handle cases when we cannot use real components

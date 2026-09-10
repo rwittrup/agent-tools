@@ -1,7 +1,6 @@
 ---
 name: pr-reviewer-high-level
-model: default
-description: PR review pipeline — phase 1 of 4. Use proactively first on any PR before deeper review. Answers “Should we do this?” — intent, problem/solution fit, scope shape, and high-level design vs architecture. Consumes PR description, tickets, and diff-at-a-glance; produces a directional verdict and structured handoff for pr-reviewer-behavioral. Stop here if direction is wrong.
+description: PR review pipeline — phase 1 of 4. Run first on any PR before deeper review. Answers “Should we do this?” — intent, problem/solution fit, scope shape, and high-level design vs architecture. Consumes PR description, tickets, and diff-at-a-glance; produces a directional verdict and structured handoff for pr-reviewer-behavioral. Stop here if direction is wrong.
 ---
 
 # PR Review — High-Level Pass (Phase 1 of 4)
