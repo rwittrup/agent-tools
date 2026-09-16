@@ -17,7 +17,7 @@ Run these agents in sequence by name; each step consumes the previous step’s o
 ## Flow
 
 1. **Gather PR context from GitHub** — description, linked issues, reviewers’ discussion if useful, and the diff (file list + patch). Include branch/base if it clarifies risk.
-2. **High-level pass** — Run **pr-reviewer-high-level** with that context. If the verdict is blocked or needs realignment, stop and surface that before deeper passes (optionally resume after answers).
+2. **High-level pass** — Run **pr-reviewer-high-level** with that context. If the verdict is blocked or needs realignment, stop and surface that before deeper passes (optionally resume after answers). Phase 1 may flag deploy-order blockers when a PR spans multiple deployables — treat undeclared atomic deploy requirements as directional failures.
 3. **Behavioral pass** — Feed the high-level output and focused diff to **pr-reviewer-behavioral**.
 4. **Code pass** — Feed behavioral output (and prior summaries as needed) to **pr-reviewer-code**.
 5. **Polish pass** — Feed prior outputs to **pr-reviewer-polish**.
