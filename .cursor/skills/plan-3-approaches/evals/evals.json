@@ -1,0 +1,46 @@
+{
+  "skill_name": "plan-3-approaches",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need to plan out NET-3535 before I start implementation. Here's the ticket:\n\nSummary: List knowledge documents on Documents tab (view only)\n\nProblem: NET-3359 lets centers upload knowledge documents to their S3 prefix, but the Documents tab is upload-only. Centers cannot confirm what landed, when it was uploaded, or whether a re-upload replaced the right file. Listing is the remainder of CM-1 (server list) and the first CM-4 slice (center-facing view) needed for a usable MVP before delete, ingestion status, or search.\n\nDepends on: NET-3359 (upload path and Documents tab shell).\n\nAcceptance Criteria:\n- Given an authorized user on the Documents tab for their dispatch center, when knowledge documents exist in that center's S3 prefix, then they see a table with columns Name and Date uploaded for each document on the current page.\n- Default page size is 10 documents; allowed page sizes are 10, 25, 50, 100, and changing size reloads at page 1.\n- Pagination works when more documents exist than the selected page size, showing total count / page position.\n- Sorting by Name and by Date uploaded (S3 LastModified) works in both directions.\n- After a successful upload, the list reloads and shows the new/replaced filename with updated Date uploaded.\n- A user scoped to center B never sees another center's documents (S3 prefix isolation).\n- Bucket, prefix, KB ID, region, and raw S3 URIs are never shown to the client.\n\nOut of scope: delete/replace UI, download/preview, search/filtering, ingestion status, Postgres metadata table, an 'Uploaded by' column, and Bedrock ingestion jobs.\n\nCan you give me a few different ways to approach implementing this?",
+      "expected_output": "Three genuinely distinct approaches (staff/architect, quick-and-dirty, wild card) for adding a paginated, sortable, center-scoped document list backed by S3, each concrete enough to act on and clearly differentiated from the others rather than three minor variations of the same plan.",
+      "files": [],
+      "assertions": [
+        "exactly-three-approaches",
+        "approaches-labeled-by-archetype",
+        "no-actual-code",
+        "approaches-substantively-distinct",
+        "approaches-grounded-in-ticket-specifics"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Planning out NET-3564 and want to sanity check my implementation approach before I write any code. Ticket details:\n\nSummary: A user can delete a selected document from their knowledge base store\n\nProblem: Dispatch centers can upload and list ANET knowledge documents, but they cannot remove outdated or incorrect files. Stale S3 content and Postgres list rows remain until an engineer intervenes or the file is overwritten by name.\n\nAcceptance Criteria:\n- Authorized user (ANET settings write access) selects delete on a listed document and is prompted to confirm before delete proceeds.\n- On confirmed delete: S3 object removed, Postgres metadata row removed, document no longer appears in the list after refetch.\n- Read-only users see no delete affordance and the mutation is rejected if invoked directly.\n- Deleting a document not owned by the authenticated dispatch center fails at the authorization boundary without touching another center's data.\n- Deleting an already-deleted/nonexistent document returns a stable not-found outcome without leaking infra details.\n- If S3 delete fails (missing grant, KMS denial, transient fault), the Postgres row must NOT be removed, the client gets an opaque localized error, and the document stays visible.\n- On success, user sees a localized confirmation and the table updates without a full page reload.\n\nOut of scope: Bedrock ingestion sync after delete, retention/versioning/audit trail, bulk delete, search/filter, download/preview.\n\nWhat are some different ways I could build this?",
+      "expected_output": "Three genuinely distinct approaches to implementing center-scoped document delete with S3-then-Postgres ordering and failure-safety (don't orphan Postgres rows if S3 fails), spanning a thoughtful/architectural option, a fast pragmatic option, and a novel option — not three copies of the same delete-service idea with cosmetic differences.",
+      "files": [],
+      "assertions": [
+        "exactly-three-approaches",
+        "approaches-labeled-by-archetype",
+        "no-actual-code",
+        "approaches-substantively-distinct",
+        "approaches-grounded-in-ticket-specifics",
+        "addresses-authorization-boundary-constraint"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Need to plan NET-3655 before touching any code — this one feels trickier than the last two. Ticket:\n\nSummary: INT-2: Resolve center knowledge configuration from durable source\n\nProblem: Call-handler still resolves knowledgeBaseId from a LaunchDarkly flag (anet-knowledge-base-intent). Rails already persists one nonemergency_knowledge_bases row per dispatch center, but runtime retrieval doesn't consume it yet. There's also a phase-0 ADOPTED_KNOWLEDGE_BASES map in KnowledgeBaseProvisioner that assigns the SAME Bedrock KB ID to two different centers — a security problem that has to go away before a second center rolls out. The durable record's prefix column also isn't constrained to equal '{dispatch_center_id}/' or immutable after creation.\n\nAcceptance Criteria:\n- For a center with a ready nonemergency_knowledge_bases row, call-handler retrieval uses knowledge_base_id/region from that durable record (or a trusted feed derived from it) — never from LaunchDarkly or intent action_data.\n- A center with no row, or status provisioning/failed, causes retrieval to fail closed with a configuration-classified outcome — no fallback to another center's KB or the LD placeholder.\n- The ADOPTED_KNOWLEDGE_BASES bridge is removed; no two centers ever share a KB ID.\n- prefix is always '{dispatch_center_id}/' (or immutably derived from it) and can't change after insert.\n- LaunchDarkly's knowledgeBaseId is no longer the source of truth for which Bedrock KB to query.\n- Tests must fail if LD knowledgeBaseId or ADOPTED_KNOWLEDGE_BASES is reintroduced for runtime resolution.\n\nThis touches both the Go call-handler and the Ruby API. What approaches would you suggest?",
+      "expected_output": "Three genuinely distinct approaches for migrating cross-service (Go call-handler + Ruby API) config resolution off a feature flag and onto a durable per-center record, addressing the security-sensitive shared-KB removal and fail-closed behavior, with real tradeoffs between them rather than superficial rewording of one plan.",
+      "files": [],
+      "assertions": [
+        "exactly-three-approaches",
+        "approaches-labeled-by-archetype",
+        "no-actual-code",
+        "approaches-substantively-distinct",
+        "approaches-grounded-in-ticket-specifics",
+        "addresses-shared-kb-security-removal"
+      ]
+    }
+  ]
+}
