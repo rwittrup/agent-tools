@@ -1,5 +1,5 @@
 ---
-name: design-expert-reviewer-v1
+name: design-expert-reviewer
 description: Design system compliance reviewer. Use after UI code changes to verify @prepared/ui-core usage, design tokens, spacing values, and component choices.
 ---
 

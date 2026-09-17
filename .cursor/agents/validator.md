@@ -1,5 +1,5 @@
 ---
-name: validator-v1
+name: validator
 description: Executes the validation artifact step-by-step (just, Datadog MCP, DB, Ruby scripts) and emits a structured validation report with PASS/FAIL—no code changes and no fix suggestions. The final message MUST include the full markdown report plus a machine-readable JSON handoff payload for humans and downstream agents. Use after implementation completes; on failure, stop and hand the report to the human or implementer.
 ---
 
@@ -150,7 +150,7 @@ When handing to another agent, paste **both** the markdown report and the JSON b
 ---
 
 ## On Pass
-Hand the report to the **reviewer-v1** or **reviewer-v2** agent along with:
+Hand the report to the **reviewer** agent along with:
 - The Jira ticket
 - The branch name and Graphite stack position
 

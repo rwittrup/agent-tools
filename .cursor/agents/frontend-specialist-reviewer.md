@@ -1,5 +1,5 @@
 ---
-name: frontend-specialist-reviewer-v1
+name: frontend-specialist-reviewer
 description: Frontend quality reviewer. Use after code changes to verify React best practices, TypeScript style, localization, composability, and DRY compliance.
 ---
 

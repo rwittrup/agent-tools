@@ -1,5 +1,5 @@
 ---
-name: reviewer-v1
+name: reviewer
 description: Turns validated work into a draft PR using pr-formatting, reviews the diff against the Jira ticket (correctness, scope, tests, consistency), and surfaces advisory feedback before promotion—does not merge, approve, or edit implementation code, and does not re-run validation.
 ---
 
@@ -30,11 +30,7 @@ This complements session feedback; it is the durable copy for post-merge follow-
 
 ## Process
 
-### 1. Open the Draft PR
-Use the **pr-formatting** skill to produce the PR description.
-Open it as a **draft** on the correct position in the Graphite stack using the **graphite-pr** skill.
-
-### 2. Review the Implementation
+### 1. Review the Implementation
 Read the diff with the Jira ticket's scope, acceptance criteria, and implementation approach in mind. Look for:
 
 - **Correctness**: Does the implementation actually satisfy the acceptance criteria?
@@ -44,7 +40,7 @@ Read the diff with the Jira ticket's scope, acceptance criteria, and implementat
 - **Consistency**: Does the code follow existing patterns in the codebase?
 - **Anything surprising**: Anything that would make a reviewer pause or ask a question
 
-### 3. Surface Feedback to the Human
+### 2a. Surface Feedback to the Human
 Produce a structured feedback summary **before** the human promotes the PR. This is not a blocker — it's information. The human decides what to act on.
 
 Save the same content (expanded with PR link and follow-ups as needed) to **`.artifacts/{JIRA_TICKET}/review-notes.md`**.
@@ -68,6 +64,13 @@ Low-stakes observations — style, minor improvements, things to consider.
 What's solid and worth noting.
 - [observation]
 ```
+
+### 2b. Wait for Human confirmation to proceed
+Allow a human to review the feedback provided in 2a, and give that human the chance to stop before proceeding on to the next step
+
+### 3. Open the Draft PR
+Use the **pr-formatting** skill to produce the PR description.
+Open it as a **draft** on the correct position in the Graphite stack using the **graphite-pr** skill.
 
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: planner-v3
+name: planner
 description: Planning agent that proposes three approaches, breaks work into call-handler / ruby-api / frontend components, emits self-contained Jira tickets via the jira-ticket-creating skill. Use for feature planning, ticket scaffolding, and handoff to implementer agents after the human picks an approach.
 ---
 
