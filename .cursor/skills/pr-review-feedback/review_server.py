@@ -69,27 +69,36 @@ def generate_html(findings: list, pr: dict) -> str:
         )
         sev = html.escape(str(f.get("severity", "")))
         typ = html.escape(str(f.get("type", "")))
-        cards.append(f"""<section class="card" data-index="{i}">
-      <header><span class="idx">#{i}</span>
+        hidden = "" if i == 0 else " hidden"
+        cards.append(f"""<section class="card finding-card" data-index="{i}"{hidden}>
+      <header class="finding-meta"><span class="idx">#{i}</span>
         <span class="sev sev-{sev}">{sev}</span>
         <span class="type">{typ}</span>
         <span class="loc">{loc_html}</span></header>
-      <p class="finding">{text}</p>
-      <div class="controls">
-        <label>Verdict:
-          <label><input type="radio" name="verdict-{i}" value="agree" checked> agree</label>
-          <label><input type="radio" name="verdict-{i}" value="disagree"> disagree</label>
-        </label>
-        <label>Comment:
-          <select name="comment-{i}">
-            <option value="none" selected>none</option>
-            <option value="inline">inline</option>
-            <option value="general">general</option>
-          </select>
-        </label>
-        <label class="reason">Reason (disagree only, not posted):
-          <input type="text" name="reason-{i}" placeholder="optional">
-        </label>
+      <div class="card-body">
+        <p class="finding">{text}</p>
+        <div class="controls">
+          <div class="decision-row">
+            <div class="control-group">
+              <span class="control-label">Verdict</span>
+              <div class="choice-row">
+                <label><input type="radio" name="verdict-{i}" value="agree" checked> Agree</label>
+                <label><input type="radio" name="verdict-{i}" value="disagree"> Disagree</label>
+              </div>
+            </div>
+            <div class="control-group">
+              <span class="control-label">Comment</span>
+              <select name="comment-{i}">
+                <option value="none" selected>None</option>
+                <option value="inline">Inline</option>
+                <option value="general">General</option>
+              </select>
+            </div>
+          </div>
+          <label class="reason"><span class="control-label">Reason <span class="optional">(disagree only, not posted)</span></span>
+            <input type="text" name="reason-{i}" placeholder="Optional">
+          </label>
+        </div>
       </div>
     </section>""")
     if not cards:
@@ -104,35 +113,269 @@ def generate_html(findings: list, pr: dict) -> str:
     pr_json = json.dumps(pr).replace("<", "\\u003c")
 
     return f"""<!doctype html>
-<html><head><meta charset="utf-8">
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PR review feedback</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
 <style>
-body{{font-family:system-ui,sans-serif;max-width:900px;margin:2rem auto;padding:0 1rem}}
-.card{{border:1px solid #ddd;border-radius:8px;padding:1rem;margin:1rem 0}}
-.idx{{font-weight:700;margin-right:.5rem}}
-.sev{{padding:.1rem .5rem;border-radius:4px;font-size:.8rem}}
-.sev-high{{background:#fde2e2}} .sev-low{{background:#e2f0fd}}
-.type,.loc{{margin-left:.5rem;font-size:.85rem;color:#555}}
-.finding{{white-space:pre-wrap}}
-.controls{{display:flex;gap:1.5rem;flex-wrap:wrap;align-items:center}}
-.reason{{flex:1 1 100%}} .reason input{{width:100%}}
-#stance{{border-top:2px solid #333;margin-top:2rem;padding-top:1rem}}
-#status{{color:#555;min-height:1.5em}}
-button{{font-size:1rem;padding:.5rem 1.5rem}}
+:root {{
+  --bg: #faf9f5;
+  --surface: #ffffff;
+  --border: #e8e6dc;
+  --text: #141413;
+  --text-muted: #b0aea5;
+  --accent: #d97757;
+  --accent-hover: #c4613f;
+  --green: #788c5d;
+  --green-bg: #eef2e8;
+  --red: #c44;
+  --red-bg: #fceaea;
+  --header-bg: #141413;
+  --header-text: #faf9f5;
+  --radius: 6px;
+}}
+* {{ box-sizing: border-box; margin: 0; padding: 0; }}
+body {{
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Lora', Georgia, serif;
+  background: var(--bg);
+  color: var(--text);
+}}
+.header {{
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  background: var(--header-bg);
+  color: var(--header-text);
+}}
+.header h1 {{
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+}}
+.pr {{
+  margin-top: .25rem;
+  max-width: 72rem;
+  overflow-wrap: anywhere;
+  font-size: .8rem;
+  opacity: .7;
+}}
+.progress {{ flex-shrink: 0; font-size: .875rem; opacity: .8; }}
+.main {{
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem 2rem;
+}}
+.section, .card {{
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}}
+.card + .card {{ margin-top: 1rem; }}
+.finding-meta, .section-header {{
+  padding: .75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  font-family: 'Poppins', sans-serif;
+}}
+.finding-meta {{ display: flex; align-items: center; gap: .5rem; }}
+.idx {{ font-size: .75rem; font-weight: 600; color: var(--text-muted); }}
+.sev {{
+  padding: .125rem .5rem;
+  border-radius: 9999px;
+  font-size: .6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}}
+.sev-high {{ background: var(--red-bg); color: var(--red); }}
+.sev-low {{ background: var(--green-bg); color: var(--green); }}
+.type {{
+  font-size: .6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  color: var(--text-muted);
+}}
+.loc {{ margin-left: auto; font: .75rem 'SF Mono', SFMono-Regular, Consolas, monospace; }}
+.loc a, .loc span {{ color: var(--accent); text-decoration: none; }}
+.loc a:hover {{ text-decoration: underline; }}
+.card-body {{ padding: 1rem; }}
+.finding {{ white-space: pre-wrap; font-size: .9375rem; line-height: 1.6; }}
+.controls {{
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}}
+.decision-row {{
+  display: flex;
+  align-items: flex-end;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}}
+.control-group {{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: .4rem;
+}}
+.choice-row {{
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+  min-height: 2.25rem;
+}}
+.control-label {{
+  font-family: 'Poppins', sans-serif;
+  font-size: .75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}}
+.optional {{
+  font-family: 'Lora', Georgia, serif;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}}
+label {{ font-size: .875rem; }}
+input[type="radio"] {{ accent-color: var(--accent); }}
+select, input[type="text"] {{
+  padding: .5rem .625rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--text);
+  font: .875rem 'Lora', Georgia, serif;
+}}
+.controls select {{ height: 2.25rem; min-width: 9rem; }}
+select:focus, input[type="text"]:focus {{
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(217, 119, 87, .15);
+}}
+.reason {{ flex: 1 1 100%; display: grid; gap: .4rem; }}
+.reason input {{ width: 100%; }}
+.empty {{ padding: 2rem; text-align: center; color: var(--text-muted); font-style: italic; }}
+#stance {{ margin-top: 1.25rem; }}
+.section-header {{
+  font-size: .75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--text-muted);
+}}
+.section-body {{ padding: 1rem; }}
+.stance-options {{ display: flex; flex-wrap: wrap; gap: 1.25rem; }}
+.note {{ display: grid; gap: .4rem; margin-top: 1rem; }}
+.note input {{ width: 100%; }}
+.pager {{
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}}
+.pager[hidden] {{ display: none; }}
+.pager button {{
+  padding: .4rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  font-size: .8125rem;
+  font-weight: 500;
+}}
+.pager button:disabled {{ opacity: .4; cursor: default; }}
+.pager button:not(:disabled):hover {{ border-color: var(--accent); }}
+#page-label {{
+  min-width: 5rem;
+  text-align: center;
+  font-family: 'Poppins', sans-serif;
+  font-size: .8125rem;
+  color: var(--text-muted);
+}}
+.nav {{
+  margin-top: 1.25rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: .75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}}
+#status {{ min-height: 1.1em; font-size: .75rem; color: var(--text-muted); text-align: center; }}
+#submit {{
+  padding: .5rem 1.5rem;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  font-size: .875rem;
+  font-weight: 600;
+  transition: background .15s;
+}}
+#submit:hover {{ background: var(--accent-hover); }}
+@media (max-width: 640px) {{
+  .header {{ align-items: flex-start; padding: 1rem; }}
+  .main {{ padding: 1rem; }}
+  .finding-meta {{ flex-wrap: wrap; }}
+  .loc {{ width: 100%; margin-left: 0; overflow-wrap: anywhere; }}
+  .decision-row {{ align-items: stretch; }}
+}}
 </style></head>
 <body>
-<h1>PR review feedback</h1>
-<p class="pr">{pr_line}</p>
+<header class="header">
+  <div>
+    <h1>PR Review Feedback</h1>
+    <p class="pr">{pr_line}</p>
+  </div>
+  <div class="progress" id="progress">{len(findings)} finding{"s" if len(findings) != 1 else ""}</div>
+</header>
+<main class="main">
 <div id="findings">{''.join(cards)}</div>
-<div id="stance">
-<h2>Review stance</h2>
-<label><input type="radio" name="decision" value="approve"> approve</label>
-<label><input type="radio" name="decision" value="request_changes"> request changes</label>
-<label><input type="radio" name="decision" value="no_action" checked> no action</label>
-<label style="display:block;margin-top:.5rem">Note (optional): <input type="text" id="note" style="width:100%"></label>
+<div class="pager" id="pager"{" hidden" if len(findings) <= 1 else ""}>
+  <button type="button" id="prev" disabled>Previous</button>
+  <span id="page-label">1 of {len(findings)}</span>
+  <button type="button" id="next">Next</button>
 </div>
-<p id="status"></p>
-<button id="submit">Submit</button>
+<section class="section" id="stance">
+  <div class="section-header">Review stance</div>
+  <div class="section-body">
+    <div class="stance-options">
+      <label><input type="radio" name="decision" value="approve"> Approve</label>
+      <label><input type="radio" name="decision" value="request_changes"> Request changes</label>
+      <label><input type="radio" name="decision" value="no_action" checked> No action</label>
+    </div>
+    <label class="note"><span class="control-label">Note <span class="optional">(optional)</span></span>
+      <input type="text" id="note">
+    </label>
+  </div>
+</section>
+<div class="nav">
+  <p id="status"></p>
+  <button id="submit">Submit Review</button>
+</div>
+</main>
 <script>
 const FINDINGS = {findings_json};
 const PR = {pr_json};
@@ -213,6 +456,27 @@ document.getElementById('submit').addEventListener('click', async () => {{
     statusEl.textContent = 'submitted — you can close this tab';
   }} catch (e) {{ statusEl.textContent = 'submit failed'; }}
 }});
+const cards = [...document.querySelectorAll('.finding-card')];
+let page = 0;
+const prevBtn = document.getElementById('prev');
+const nextBtn = document.getElementById('next');
+const pageLabel = document.getElementById('page-label');
+const progressEl = document.getElementById('progress');
+function renderPage() {{
+  if (!cards.length) return;
+  cards.forEach((card, i) => {{ card.hidden = i !== page; }});
+  if (pageLabel) pageLabel.textContent = (page + 1) + ' of ' + cards.length;
+  if (prevBtn) prevBtn.disabled = page === 0;
+  if (nextBtn) nextBtn.disabled = page === cards.length - 1;
+  if (progressEl) progressEl.textContent = 'Finding ' + (page + 1) + ' of ' + cards.length;
+}}
+if (prevBtn) prevBtn.addEventListener('click', () => {{
+  if (page > 0) {{ page -= 1; renderPage(); }}
+}});
+if (nextBtn) nextBtn.addEventListener('click', () => {{
+  if (page < cards.length - 1) {{ page += 1; renderPage(); }}
+}});
+renderPage();
 restore();
 </script></body></html>"""
 
