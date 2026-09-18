@@ -47,7 +47,7 @@ Quick and dirty, not introducing any bugs or serious performance issues, but not
 #### Approach 3
 Wild card - an interesting or novel approach, as if done by a really talented engineer with a broad range of experiences. Something that works, and works well, but may not be obvious to other engineers on the team.
 
-For deeper option design before narrowing to three approaches, use the **design-planning** skill.
+Use the **plan-3-approaches** skill for the three approaches.
 
 ### 2. Break Work Into Components
 Once an approach is chosen, decompose the work into logical components. Default component boundaries for this codebase:
