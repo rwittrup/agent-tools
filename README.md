@@ -4,7 +4,7 @@ Harness-agnostic skills and agents for planning, implementation, validation, and
 
 ## Referencing skills and agents
 
-Reference skills and agents **by name only** (e.g. **commit-formatting**, **implementer**, **pr-reviewer-high-level**).
+Reference skills and agents **by name only** (e.g. **commit-formatting**, **implementer**, **code-reviewer-high-level**).
 
 Do not hardcode filesystem paths or harness-specific roots. Each harness maps names to its own skill and agent locations.
 
