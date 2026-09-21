@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 # Sync local .cursor/skills, .cursor/agents, and .cursor/rules into Cursor/Claude
-# paths via symlinks. For each entry under those dirs, ensures a symlink exists in
-# the corresponding home directories pointing at this repo. Idempotent: correct
-# symlinks are left unchanged; missing symlinks are created.
+# paths. Agents and rules (and non-Cursor skill dests) use symlinks. Skills under
+# ~/.cursor/skills are real directory copies so Cursor Cloud Agents can sync them
+# (cloud sync only reads real dirs directly inside ~/.cursor/skills/).
 #
-# Symlinks that point at the wrong target are removed and recreated.
+# For ~/.cursor/skills: the destination is cleared, then each skill folder is
+# copied. Other dests: idempotent symlinks (correct links left alone; wrong-target
+# links removed and recreated).
 #
-# Default: quiet (errors only; one summary line if anything was created).
-# Use -v / --verbose for per-symlink logs. See --help.
+# Default: quiet (errors only; one summary line if anything changed).
+# Use -v / --verbose for per-entry logs. See --help.
 
 set -euo pipefail
 
@@ -15,15 +17,19 @@ VERBOSE=0
 created_count=0
 replaced_count=0
 skipped_count=0
+copied_count=0
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILLS_SRC="${REPO_ROOT}/.cursor/skills"
 AGENTS_SRC="${REPO_ROOT}/.cursor/agents"
 RULES_SRC="${REPO_ROOT}/.cursor/rules"
 
-SKILL_DEST_DIRS=(
+# Real copies (not symlinks) — required for Cursor Cloud Agent skill sync.
+CURSOR_SKILLS_DEST="${HOME}/.cursor/skills"
+
+# Symlink destinations for skills (cloud sync does not use these).
+SKILL_SYMLINK_DEST_DIRS=(
   "${HOME}/.agents/skills"
-  "${HOME}/.cursor/skills"
   "${HOME}/.claude/skills"
 )
 AGENT_DEST_DIRS=(
@@ -50,21 +56,34 @@ usage() {
 Usage: sync-skills-and-agents.sh [-v|--verbose]
 
   Sources (repo root = directory containing this script):
-    .cursor/skills/*  →  ~/.agents/skills/<name>, ~/.cursor/skills/<name>, ~/.claude/skills/<name>
+    .cursor/skills/*  →  ~/.cursor/skills/<name>  (real copy; dest cleared first)
+                      →  ~/.agents/skills/<name>, ~/.claude/skills/<name>  (symlink)
     .cursor/agents/*  →  ~/.cursor/agents/<name>, ~/.claude/agents/<name>
     .cursor/rules/*   →  ~/.cursor/rules/<name>, ~/.claude/rules/<name>
 
+  ~/.cursor/skills is wiped then re-copied so obsolete skills are removed and
+  Cloud Agents see real directories (not symlinks).
+
   Wrong-target symlinks are replaced automatically (same name).
 
-  Default: quiet — prints only errors, plus one line if symlinks were created
-  or replaced.
-  -v, --verbose  Log each symlink check (unchanged, created, replaced).
+  Default: quiet — prints only errors, plus one line if anything changed.
+  -v, --verbose  Log each check (unchanged, created, replaced, copied).
 EOF
 }
 
 ensure_dir() {
   local d="$1"
   [[ -d "$d" ]] || mkdir -p "$d" || die "could not create directory: $d"
+}
+
+# Remove dest entirely and recreate empty, so obsolete skills are gone.
+reset_dir() {
+  local d="$1"
+  if [[ -e "$d" ]]; then
+    rm -rf "$d" || die "could not remove directory: $d"
+  fi
+  mkdir -p "$d" || die "could not create directory: $d"
+  vlog "cleared: $d"
 }
 
 # Canonical absolute path (resolves symlinks). Requires python3.
@@ -124,6 +143,21 @@ link_one() {
   fi
 }
 
+# copy_one <dest_parent> <name> <source_path>
+# Copies source into dest_parent/name as a real directory/file (not a symlink).
+copy_one() {
+  local dest_parent="$1"
+  local name="$2"
+  local source_path="$3"
+  local dest="${dest_parent}/${name}"
+
+  [[ -e "$source_path" ]] || die "source missing: $source_path"
+
+  cp -R "$source_path" "$dest" || die "cp -R failed: $source_path -> $dest"
+  ((copied_count++)) || true
+  vlog "copied: $source_path -> $dest"
+}
+
 main() {
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -146,9 +180,12 @@ main() {
   [[ -d "$RULES_SRC" ]] || die "missing directory: $RULES_SRC"
 
   local d
-  for d in "${SKILL_DEST_DIRS[@]}" "${AGENT_DEST_DIRS[@]}" "${RULE_DEST_DIRS[@]}"; do
+  for d in "${SKILL_SYMLINK_DEST_DIRS[@]}" "${AGENT_DEST_DIRS[@]}" "${RULE_DEST_DIRS[@]}"; do
     ensure_dir "$d"
   done
+
+  # Cloud Agents need real dirs under ~/.cursor/skills — wipe then copy.
+  reset_dir "$CURSOR_SKILLS_DEST"
 
   shopt -s nullglob
 
@@ -156,7 +193,8 @@ main() {
   for path in "${SKILLS_SRC}"/*; do
     name="$(basename "$path")"
     [[ "$name" == "." || "$name" == ".." ]] && continue
-    for d in "${SKILL_DEST_DIRS[@]}"; do
+    copy_one "$CURSOR_SKILLS_DEST" "$name" "$path"
+    for d in "${SKILL_SYMLINK_DEST_DIRS[@]}"; do
       link_one "$d" "$name" "$path"
     done
   done
@@ -182,8 +220,8 @@ main() {
   if [[ "$VERBOSE" -eq 1 ]]; then
     echo "done."
   else
-    if [[ "$created_count" -gt 0 ]] || [[ "$replaced_count" -gt 0 ]]; then
-      echo "Symlinks: ${created_count} created, ${replaced_count} replaced (${skipped_count} already correct)."
+    if [[ "$created_count" -gt 0 ]] || [[ "$replaced_count" -gt 0 ]] || [[ "$copied_count" -gt 0 ]]; then
+      echo "Sync: ${copied_count} skills copied to ~/.cursor/skills; symlinks: ${created_count} created, ${replaced_count} replaced (${skipped_count} already correct)."
     fi
   fi
 }
