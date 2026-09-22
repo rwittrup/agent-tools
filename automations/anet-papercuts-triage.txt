@@ -1,0 +1,89 @@
+# Goal
+Unattended ANET Papercuts triage → one small draft PR, or nothing.
+No human involvement until Ryan reviews the opened draft PR.
+
+# Mode — unattended factory
+Run as an unattended software-factory job coded into this prompt (do not wait for plan approval, validation triage, or other human checkpoints).
+Auto-approve the chosen approach / Recommendation and continue.
+Human gate is only the draft PR at the end.
+
+# Hard constraints
+- Prefer zero change over a mediocre change. If the ticket is unclear, blocked on a product decision, or not safely completable in one sitting — stop. Do not open a PR. Summarize why.
+- At most one PR per run. Scope must be small and reviewable in one sitting.
+- No drive-by refactors unrelated to the chosen ticket.
+- Stay backwards-compatible across staggered deploys.
+- If a finding needs a product decision, skip it this run (log it in the run summary) rather than guessing.
+
+# Skills (by name — read and follow when available)
+- planning-workflow
+- testing-philosophy
+- implementation-philosophy
+- design-philosophy
+- go-design-philosophy (when the work is in Go, e.g. call-handler)
+- plan-3-approaches (only when you judge the problem sufficiently large — see Phase 3)
+- commit-formatting
+- graphite-branching
+- graphite-pr
+- pr-formatting
+- jira-ticket-creating (only if you need to update ticket fields; do not invent a new ticket for papercuts)
+
+If a named skill is missing, follow the phase rules below instead of inventing a new process.
+
+# Agents (by name — dispatch as subagents; model: auto, cost)
+- tester — writes tests only from the ticket/spec and chosen approach; does not implement
+- implementer — makes those tests pass; does not modify the tests; does not need the full ticket narrative beyond what the tests encode
+- reviewer — reviews the branch diff before the draft PR; returns findings; does not open the PR
+
+# Phase 1 — Intake
+Review the ANET Papercuts dashboard:
+https://reporty.atlassian.net/jira/software/c/projects/NET/boards/1579?label=Papercut
+
+Choose one ticket with status "TO DO" that is either unassigned or assigned to "Ryan Wittrup". For unassigned stories, prioritize those with "Ryan Wittrup" as reporter.
+
+If no suitable ticket: write a short run summary and exit (no branch, no PR).
+
+# Phase 2 — Spec
+Treat the chosen Jira ticket (description + acceptance / context) as the finalized spec.
+Review context enough to understand the problem and likely root cause.
+Do not invent requirements the ticket does not support. If the ticket is not a usable spec, stop and summarize — do not open a PR.
+
+# Phase 3 — Plan (always; auto-approve)
+Always plan before coding. Do not wait for a human.
+
+Decide whether the problem is sufficiently large for full plan-3-approaches:
+- If yes: follow plan-3-approaches (Staff/Architect, Quick and Dirty, Wild Card + Recommendation). You may dispatch planner for this, or run the skill in this chat.
+- If no: write a short plan (idea, shape at component level, tradeoffs) and state the chosen approach in one line.
+
+Auto-approve the Recommendation / chosen approach and continue. Log the choice in the run summary.
+
+Align the plan with planning-workflow, testing-philosophy, implementation-philosophy, design-philosophy, and go-design-philosophy when applicable.
+
+# Phase 4 — TDD loop
+Dispatch in series (model: auto, cost):
+1. tester — unit/integration tests for the chosen approach; TDD-first; leave higher-level remainder untested if unit/integration cannot express it
+2. implementer — make those tests pass with minimum code; then refactor while green; small commits via commit-formatting
+
+Create the working branch with graphite-branching if needed.
+
+# Phase 5 — Review
+Dispatch reviewer on the branch diff vs the base branch (model: auto, cost).
+- Fix high-severity in-scope findings before opening a PR.
+- Leave true nitpicks and out-of-scope items for the PR description / run summary.
+- Prefer abandon (no PR) over shipping a mediocre fix if review shows the change is not worth it.
+
+# Phase 6 — Draft PR + notify
+If still valuable after review: open exactly one draft PR via graphite-pr and pr-formatting (Summary, Context, Changes, Acceptance/Validation).
+Then send a Slack DM to @rwittrup with:
+- the Jira ticket link
+- the draft PR link
+- one-line summary of what changed
+
+If not valuable: do not open a PR; Slack DM @rwittrup only if useful (e.g. ticket was blocked), with a one-line reason.
+
+# Run summary (always)
+End with:
+- Ticket chosen (or none)
+- Plan path used (full plan-3-approaches vs short plan) and chosen approach
+- What shipped or why nothing shipped
+- Draft PR URL or “no PR”
+- Slack notified: yes/no

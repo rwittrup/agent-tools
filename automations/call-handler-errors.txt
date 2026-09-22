@@ -1,0 +1,105 @@
+# Goal
+Unattended call-handler production error triage → one small draft PR, or nothing.
+No human involvement until Ryan reviews the opened draft PR.
+
+# Mode — unattended factory
+Run as an unattended software-factory job coded into this prompt (do not wait for plan approval, validation triage, or other human checkpoints).
+Auto-approve the chosen approach / Recommendation and continue.
+Human gate is only the draft PR at the end.
+
+# Hard constraints
+- Prefer zero change over a mediocre change. If there is no confirmed fixable bug, or confidence is low — stop. Do not open a PR. Summarize why.
+- At most one PR per run. Scope must be small and reviewable in one sitting.
+- No drive-by refactors unrelated to the chosen bug.
+- Stay backwards-compatible across staggered deploys.
+- If a finding needs a product decision, skip it this run (log it in the run summary) rather than guessing.
+- Insufficient log/stack context for an error: note it in the summary and ignore that case for further action.
+
+# Skills (by name — read and follow when available)
+- planning-workflow
+- testing-philosophy
+- implementation-philosophy
+- design-philosophy
+- go-design-philosophy (call-handler is Go — use this)
+- plan-3-approaches (only when you judge the problem sufficiently large — see Phase 3)
+- commit-formatting
+- graphite-branching
+- graphite-pr
+- pr-formatting
+- jira-ticket-creating
+
+If a named skill is missing, follow the phase rules below instead of inventing a new process.
+
+# Agents (by name — dispatch as subagents; model: auto, cost)
+- tester — writes tests only from the ticket/spec and chosen approach; does not implement
+- implementer — makes those tests pass; does not modify the tests; does not need the full ticket narrative beyond what the tests encode
+- reviewer — reviews the branch diff before the draft PR; returns findings; does not open the PR
+
+# Phase 1 — Intake
+Review DataDog logs for the call-handler service over the last day:
+- env: live-production
+- service: call-handler-api.app
+- status: error
+
+Find the most common error that looks like a real bug and is plausibly fixable from the available evidence.
+Review logs and stack traces for a root cause.
+If no confirmed fixable bug: write a short run summary and exit (no ticket, no branch, no PR). Optionally Slack DM @rwittrup with a one-line “nothing to fix” summary only if useful.
+
+# Phase 2 — Spec (create ticket)
+If a root cause can be established and there is a confirmed bug, create a new Jira NET ticket via jira-ticket-creating with:
+
+# Description
+# Error message and stack trace
+# Steps to reproduce
+# Root cause
+
+Ticket fields:
+- Type: Bug
+- Assignee: Ryan Wittrup
+- Status: Triage
+
+That ticket is the finalized spec for the rest of the run. Do not invent requirements beyond it.
+
+When the ticket is created, send a Slack DM to @rwittrup with the Jira story link (before coding).
+
+# Phase 3 — Plan (always; auto-approve)
+Always plan before coding. Do not wait for a human.
+
+Decide whether the problem is sufficiently large for full plan-3-approaches:
+- If yes: follow plan-3-approaches (Staff/Architect, Quick and Dirty, Wild Card + Recommendation). You may dispatch planner for this, or run the skill in this chat.
+- If no: write a short plan (idea, shape at component level, tradeoffs) and state the chosen approach in one line.
+
+Auto-approve the Recommendation / chosen approach and continue. Log the choice in the run summary.
+
+Align the plan with planning-workflow, testing-philosophy, implementation-philosophy, design-philosophy, and go-design-philosophy.
+
+# Phase 4 — TDD loop
+Dispatch in series (model: auto, cost):
+1. tester — unit/integration tests for the chosen approach; TDD-first; leave higher-level remainder untested if unit/integration cannot express it
+2. implementer — make those tests pass with minimum code; then refactor while green; small commits via commit-formatting
+
+Create the working branch with graphite-branching if needed.
+
+# Phase 5 — Review
+Dispatch reviewer on the branch diff vs the base branch (model: auto, cost).
+- Fix high-severity in-scope findings before opening a PR.
+- Leave true nitpicks and out-of-scope items for the PR description / run summary.
+- Prefer abandon (no PR) over shipping a mediocre fix if review shows the change is not worth it.
+
+# Phase 6 — Draft PR + notify
+If still valuable after review: open exactly one draft PR via graphite-pr and pr-formatting (Summary, Context, Changes, Acceptance/Validation).
+Then send a Slack DM to @rwittrup with:
+- the Jira ticket link
+- the draft PR link
+- one-line summary of what changed
+
+If not valuable after review: do not open a PR; Slack DM @rwittrup with the ticket link and a one-line reason no PR was opened.
+
+# Run summary (always)
+End with:
+- Top errors considered (one line each) and which was chosen (or none)
+- Ticket created (key/URL) or “no ticket”
+- Plan path used (full plan-3-approaches vs short plan) and chosen approach
+- What shipped or why nothing shipped
+- Draft PR URL or “no PR”
+- Slack notified: yes/no (ticket and/or PR)
