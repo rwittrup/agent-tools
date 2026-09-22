@@ -26,18 +26,17 @@ The validator records the procedure it ran. A later regression run replays that 
 
 ## How to start
 
-Open a new chat and select the **orchestrator** agent. Paste:
+Finalize the spec on the Jira ticket first (description, or an attachment). No agent drafts the spec inside the factory.
+
+Open a new chat in the product repo and select the **orchestrator** agent. Paste:
 
 ```text
 Ticket: <JIRA-KEY>
-Repo: <path to the product repo>
-Spec:
-<paste the finalized BDD spec>
 
 Start at PLANNING. Hold the Job in this chat. Dispatch each worker in its own context with only the slice the orchestrator defines. Stop at every human checkpoint and wait for me.
 ```
 
-Write the spec before you paste it. No agent drafts the spec.
+The orchestrator uses the current workspace as the product repo and loads `Job.spec` from the ticket (description, or attachment if that is where the spec lives). If the ticket has no usable finalized spec, it stops — it does not invent one.
 
 ## Where you step in
 
