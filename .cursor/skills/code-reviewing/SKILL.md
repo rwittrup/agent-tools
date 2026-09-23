@@ -1,6 +1,6 @@
 ---
 name: code-reviewing
-description: Runs a parallel code review on any set of changes — a feature branch, staged/uncommitted local work, or a diff handed to it by an agent (like pr-reviewer or reviewer) — using a high-level directional gate, three independent domain reviews (behavioral, quality, polish) fanned out in parallel, and a high-signal confidence filter, then aggregates every JSON finding into one deduped array. Takes code+branch, returns findings — it does not decide what to do with them.
+description: Runs a parallel code review on any set of changes — a feature branch, staged/uncommitted local work, or a diff handed to it by an agent using a high-level directional gate, three independent domain reviews (behavioral, quality, polish) fanned out in parallel, and a high-signal confidence filter, then aggregates every JSON finding into one deduped array. Takes code+branch, returns findings — it does not decide what to do with them.
 ---
 
 # Code reviewing (parallel pipeline)

@@ -2,7 +2,7 @@
 """Local viewer for pr-review-feedback dispositions.
 
 Render plus collect only: shows code-reviewing findings for human
-disposition and persists a structured envelope for pr-reviewer to act on.
+disposition and persists a structured envelope for the caller to act on.
 Stdlib only.
 """
 
