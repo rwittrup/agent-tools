@@ -5,7 +5,7 @@ description: Renders code-reviewing findings in a local web UX to collect per-fi
 
 # PR Review Feedback
 
-Render plus collect only, invoked by **pr-reviewer** between the **code-reviewing** output and GitHub actions. Shows each finding for human disposition and returns a structured envelope. It never posts comments or sets a stance — **pr-reviewer** acts on the returned dispositions.
+Render plus collect only. Shows each finding for human disposition and returns a structured envelope. It never posts comments or sets a stance.
 
 # Inputs
 
@@ -39,7 +39,8 @@ Rules:
 - `verdict`: `agree | disagree`; `comment`: `none | inline | general`.
 - `reason`: optional free text, only meaningful on disagree, logged not posted.
 - `review_decision.decision`: `approve | request_changes | no_action`, defaults to `no_action`.
-- **pr-reviewer** maps `comment: inline` to an inline comment when `location` is non-null, else folds it into the general summary.
+
+
 
 ## Example
 
@@ -53,6 +54,8 @@ Rules:
   "review_decision": {"decision": "no_action", "note": ""}
 }
 ```
+
+
 
 # Collecting dispositions
 
