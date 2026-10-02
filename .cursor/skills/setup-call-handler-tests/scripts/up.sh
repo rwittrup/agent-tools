@@ -2,7 +2,7 @@
 # Idempotent laptop bring-up for call-handler text sims: Docker, AWS, Rails, call-handler.
 # Rails is started only if not healthy. call-handler is ALWAYS restarted so it
 # rebuilds from the working tree (set KEEP_CALL_HANDLER=1 to leave a running one).
-# Exit 2 = needs the user (AWS login). Logs: $LOG_DIR (default $TMPDIR/call-handler-tests).
+# Exit 2 = needs the user (AWS login failed, or 1Password approval). Logs: $LOG_DIR (default $TMPDIR/call-handler-tests).
 set -uo pipefail
 cd "$(git rev-parse --show-toplevel)"
 LOG_DIR="${LOG_DIR:-${TMPDIR:-/tmp}/call-handler-tests}"
@@ -34,9 +34,7 @@ if ! docker info >/dev/null 2>&1; then
   docker info >/dev/null 2>&1 || { echo "FAILED: Docker not available"; exit 1; }
 fi
 
-if ! aws sts get-caller-identity >/dev/null 2>&1; then
-  echo "NEEDS USER: AWS session expired. Ask the user to run: ! aws login"; exit 2
-fi
+"$(dirname "$0")/ensure-aws.sh" || exit $?
 
 if rails_ok; then
   echo "rails already up"

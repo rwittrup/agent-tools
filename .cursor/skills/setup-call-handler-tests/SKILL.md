@@ -5,20 +5,20 @@ description: Bring up Rails and call-handler on a laptop and run an ANET text-si
 
 # Set up call-handler and run a scenario (laptop)
 
-You can do all of this yourself. The only human steps are the 1Password approval prompt and `aws login`. Do not ask the user to start services.
+You can do all of this yourself. The only human steps are the 1Password approval prompt and approving `aws login` in the browser. Do not ask the user to start services.
 
 ## Run it
 
 Run from the prepared911 repo root; `S` is this skill's `scripts/` directory:
 
 ```bash
-$S/up.sh          # Docker, AWS check, Rails+Redpanda (if down), call-handler (always rebuilt)
+$S/up.sh          # Docker, AWS (auto `aws login` via $S/ensure-aws.sh), Rails+Redpanda (if down), call-handler (always rebuilt)
 just call-handler scenario-headless cmd/text-conversation/feature_scenarios/<name>.yaml > out.jsonl
 $S/summarize.py [output_dir] [--grep 'type/name regex']   # newest run by default
 $S/down.sh [--all]   # stop call-handler; --all also stops Rails (just api stop)
 ```
 
-`up.sh` exit codes: `0` ready; `2` needs the user (it prints which: `! aws login`, or approve the 1Password prompt / `! op signin`, then rerun); `1` failed (it prints the log tail). First Rails build takes minutes, so run `up.sh` with a long timeout or in the background. Logs: `$TMPDIR/call-handler-tests/`.
+`up.sh` exit codes: `0` ready; `2` needs the user (it prints which: `! aws login` after `scripts/ensure-aws.sh` already tried it itself, or approve the 1Password prompt / `! op signin`, then rerun); `1` failed (it prints the log tail). First Rails build takes minutes, so run `up.sh` with a long timeout or in the background. Logs: `$TMPDIR/call-handler-tests/`.
 
 ## Things you would not guess
 
