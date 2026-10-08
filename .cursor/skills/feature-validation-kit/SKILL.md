@@ -29,6 +29,6 @@ A `setup` or `runner` can be any executable: bash and Ruby scripts are preferred
 
 - **Idempotent.** Setup and runners are safe to rerun. To test another configuration, write another setup script. It can share the same runner with different flags or arguments.
 - **Small and focused.** Each script does one job, and scripts combine to do more.
-- **Compose with pipes.** A script writes its results to stdout so the next one can read them. For example, setup prints the IDs it created, and a runner reads them from stdin.
+- **Compose with pipes.** If it's necessary or useful to pass data between scripts, prefer to write results to stdout so the next one can read them. For example, setup prints the IDs it created, and a runner reads them from stdin.
 - **Parameterize.** Setup configures the environment for one aspect of the feature, and runners take arguments to exercise that aspect (`inside`, `border`, `outside`).
 
