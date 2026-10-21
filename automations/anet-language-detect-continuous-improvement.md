@@ -30,7 +30,7 @@ When available in this environment, read and follow:
 - testing-philosophy / testing-principles (TDD; prefer integration-style when cheap)
 - design-philosophy (composition; clear package boundaries)
 - refactoring (behavior-preserving refactors separate from bugfixes)
-- commit-formatting + graphite-branching + graphite + pr-formatting
+- commit-formatting + graphite-branching + graphite + pr-custom
 - code-reviewing (high-level gate, then behavioral/quality/polish in parallel, then validator)
 
 If a named skill is missing, follow the embedded rules below instead of inventing a new process.
@@ -75,7 +75,7 @@ Pause briefly in the run log with the chosen approach before coding.
 - Small commits via commit-formatting; keep the app green (failing new tests that drive the change are OK until green).
 - Refactors must not mix bugfixes in the same commit (refactoring skill).
 - Branch/PR mechanics via graphite-branching + graphite when available; otherwise equivalent git/gh flow.
-- PR body via pr-formatting (Summary, Context, Changes, Acceptance/Validation).
+- PR body via pr-custom (Summary, Context, Changes, Acceptance/Validation).
 
 # Phase 6 — Review before opening/updating the PR
 Run code-reviewing on the branch diff vs main.

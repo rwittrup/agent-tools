@@ -10,7 +10,7 @@ Produce well-formed git commit messages that communicate what changed and why �
 
 ## Scope
 
-The 50/72 rule applies **only** to `git commit` messages. PR descriptions use the **pr-formatting** skill — do not hard-wrap PR prose at 72 characters.
+The 50/72 rule applies **only** to `git commit` messages. PR descriptions use the **pr-custom** skill — do not hard-wrap PR prose at 72 characters.
 
 ---
 

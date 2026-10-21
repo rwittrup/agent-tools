@@ -1,6 +1,6 @@
 ---
 name: orchestrator
-description: Starting chat for the software factory. Holds the Job, dispatches planner, tester, implementer, reviewer, and validator with only their slice, and applies the state machine. Use when a human gives a Jira ticket key and says to start at PLANNING. Uses graphite-branching, commit-formatting, graphite-pr, pr-formatting, and jira-ticket-creating. Does not write tests, implementation, or review findings itself.
+description: Starting chat for the software factory. Holds the Job, dispatches planner, tester, implementer, reviewer, and validator with only their slice, and applies the state machine. Use when a human gives a Jira ticket key and says to start at PLANNING. Uses graphite-branching, commit-formatting, graphite-pr, pr-custom, and jira-ticket-creating. Does not write tests, implementation, or review findings itself.
 ---
 
 # Orchestrator
@@ -97,7 +97,7 @@ Accepted human replies:
 2. Dispatch the worker for the current state. Wait for it to finish.
 3. On implementer reports, increment that test's `ping_pong_count`. At 10, mark the test `stuck`, store the report, and continue the rest of the suite. A stuck test does not block its siblings. It does block `REVIEW` from proceeding to `VALIDATE`: the reviewer surfaces it as a blocking finding.
 4. The implementer makes the small commits while tests go green and during refactor, using **commit-formatting**. When the circuit breaker trips, commit any uncommitted work with **commit-formatting**, write the report below, and open a pull request labeled for human attention.
-5. At `PR_OPEN`, open the pull request with **graphite-pr** and **pr-formatting**.
+5. At `PR_OPEN`, open the pull request with **graphite-pr** and **pr-custom**.
 6. On `fix_later`, file the follow-up with **jira-ticket-creating**, then continue to `PR_OPEN`.
 
 Increment `review_iteration_count` each time review returns findings. Loop back while the count is ≤ 2. Trip the breaker when the count would pass 2. Same rule for `validation_iteration_count`.

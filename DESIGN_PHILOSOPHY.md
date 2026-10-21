@@ -6,7 +6,7 @@ A skill takes input and produces structured, inspectable output. You can tell wh
 
 Examples:
 **commit-formatting** → a commit message;
-**pr-formatting** → PR structure;
+**pr-custom** → PR structure;
 **plan-3-approaches** → an implementation plan.
 
 ## An agent passes inputs to skills, and acts on the outputs from skills
