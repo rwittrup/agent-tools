@@ -3,7 +3,7 @@ name: acceptance
 description: Run the validation kit, set up services, and walk the user through story acceptance interactively. Use when the user asks to accept a story, run acceptance, or work through acceptance criteria.
 ---
 
-Setup
+# Setup
 Run the validation kit
 
 Setup whatever is needed
@@ -18,7 +18,7 @@ Services to consider starting:
 - good jobs
 
 
-Acceptance
+# Acceptance
 
 Run the automated validation and acceptance, per the validation kit
 
