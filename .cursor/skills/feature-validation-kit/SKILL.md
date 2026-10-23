@@ -21,7 +21,7 @@ A **kit** is a directory of small scripts and a README that confirm a feature wo
 
 - **setup**: puts the environment into a known state for the cases.
 - **runner(s)**: exercise the feature and show whether it behaved as expected.
-- **README**: what the feature does, how to run the kit, and what the kit does not cover.
+- **README**: what the feature does, how to run the kit, and what the kit does not cover. Include a **Services needed** list (for example `rails-goodjob`, `locations-api`, `rails-ws`), and, for each manual step, the expected result and whether a reload is needed.
 
 A `setup` or `runner` can be any executable: bash and Ruby scripts are preferred. But other options include `just` commands, python scripts, etc.
 
@@ -30,5 +30,6 @@ A `setup` or `runner` can be any executable: bash and Ruby scripts are preferred
 - **Idempotent.** Setup and runners are safe to rerun. To test another configuration, write another setup script. It can share the same runner with different flags or arguments.
 - **Small and focused.** Each script does one job, and scripts combine to do more.
 - **Compose with pipes.** If it's necessary or useful to pass data between scripts, prefer to write results to stdout so the next one can read them. For example, setup prints the IDs it created, and a runner reads them from stdin.
+- **Take the user as arguments.** `setup` takes the login email and dispatch center (defaults: `rwittrup@prepared911.com`, `Engineering PD`), and any unit or identifier the cases use. Hardcoded users or units strand the person doing acceptance.
 - **Parameterize.** Setup configures the environment for one aspect of the feature, and runners take arguments to exercise that aspect (`inside`, `border`, `outside`).
 
