@@ -42,6 +42,6 @@ A `setup` or `runner` for a Prepared911 API feature is a bash script that compos
 - **Idempotent.** Setup and runners are safe to rerun. To test another configuration, write another setup script. It can share the same runner with different flags or arguments.
 - **Small and focused.** Each script does one job, and scripts combine to do more.
 - **Compose with pipes.** If it's necessary or useful to pass data between scripts, prefer to write results to stdout so the next one can read them. For example, setup prints the IDs it created, and a runner reads them from stdin.
-- **Take the user as arguments.** `setup` takes the login email and dispatch center (defaults: `rwittrup@prepared911.com`, `Engineering PD`), and any unit or identifier the cases use. Hardcoded users or units strand the person doing acceptance.
+- **Take the user from the environment, never hardcode one.** Prepared911 API kits resolve personas from the engineer's own seeded users (`KIT_USER_EMAIL`, default `git config user.email`) and use the seeded Engineering PD (`KIT_CENTER_ID` overrides); they take no email arguments. Kits for other layers take the login email and center as arguments with no personal defaults. Units and other identifiers come from the run tag or arguments. A hardcoded user or unit strands the person doing acceptance.
 - **Parameterize.** Setup configures the environment for one aspect of the feature, and runners take arguments to exercise that aspect (`inside`, `border`, `outside`).
 

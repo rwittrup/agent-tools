@@ -31,6 +31,6 @@ Acceptance is done when every AC has a row in a results table: criterion, user's
 
 Use these when seeding. Use them as given.
 
-- email: rwittrup@prepared911.com
-- dispatch center: Engineering PD
+- email: the engineer's own seeded user, `KIT_USER_EMAIL` (default `git config user.email`). UNCAD kits resolve their personas from it. For a kit that takes an email argument instead, use the account the engineer signs in to Dispatch with.
+- dispatch center: Engineering PD (seeded)
 - LaunchDarkly flags in dev are already on. Do not override them unless the kit says so.
