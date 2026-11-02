@@ -10,7 +10,7 @@ Find the story's validation kit (`docs/<area>/validation/<feature-slug>/`) and r
 1. Call `git-worktree-setup`, then `start-worktree-services`. They own ports, services and 1Password.
 2. Run `just` commands directly. 1Password prompts the user out of band; wait for the command to finish.
 3. Start the union of the kit's "Services needed" and these defaults: ruby api, dispatch, locations, good jobs, AnyCable, rbac.
-4. Seed with the kit's `setup.sh`, using the Configuration values below.
+4. Seed with the kit's `setup.sh`, using the Configuration values below. UNCAD kits take the user from `KIT_USER_EMAIL` (default `git config user.email`) and use the seeded Engineering PD; the API base URL defaults to the worktree's Rails port.
 
 Setup is done when every started service shows running in `docker compose ps`, the API `/healthz` returns 200, and `curl` on the Dispatch port returns 200.
 
@@ -18,7 +18,7 @@ Print a port table from `just worktree-info` (API, Dispatch, DB). Build every UR
 
 # Acceptance
 
-Run the kit's automated validation first. Then work through acceptance together:
+Run the kit's automated validation (`validate.sh`) first; its closing `Step | Result | Verdict` table is the automated evidence. Then work through acceptance together:
 
 1. Give the user numbered steps. Before each step, state the expected result and whether a reload is needed.
 2. The user replies with what they see in the UX.

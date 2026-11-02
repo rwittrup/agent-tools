@@ -17,13 +17,25 @@ A **kit** is a directory of small scripts and a README that confirm a feature wo
 
 
 
+## Two tiers (Prepared911 API features)
+
+For features reached through the Rails API (UNCAD/CFS and similar), build the kit from two tiers. The design is `docs/uncad/validation/DESIGN.md` and ADR 0001 (`docs/adr/0001-validation-kits-drive-state-over-the-api.md`); the shared pieces are in `docs/uncad/validation/{lib,entities,workflows}` and its README lists them. Copy a sibling kit (for example `cfs-unassign-unit-graphql`).
+
+- **Workflow actions** (`workflows/`, bash + `curl` + `jq`): HTTP, GraphQL for dispatcher actions, REST for the CAD side. They create, transition and read state, and may call each other. All setup beyond the bare minimum, every state transition and every assertion goes through them. A missing action is added to `workflows/`, not written inline.
+- **Entity operations** (`entities/`, Ruby via `rails runner`): direct DB writes, a last resort for setup that no HTTP path reaches. Each file opens with one line saying why no HTTP path exists. Never use one to make a transition, and never call a workflow from one.
+- Personas (`persona dispatcher|supervisor|responder|superadmin`) are the engineer's own seeded users (`KIT_USER_EMAIL`, default `git config user.email`). Kits never create users or centers. Reruns create new rows tagged with the run tag and delete nothing; `just api reset-db` is the full reset.
+- In-process assertions (query counts, job queues, stubbed flags, subscription recording) belong in RSpec, not a kit. List them under "Not covered".
+- Flags are the engineer's to set. The README declares the flags the cases need; flag-off behavior is a documented re-run variant.
+
+A kit is `README.md`, `setup.sh` (walkthrough state plus what to look at in Dispatch) and `validate.sh` (cases that each build their own CFS, PASS/FAIL per case, exit 1 on any FAIL, ending with a `Step | Result | Verdict` table to paste into the ticket). Print `key=value` on stdout and prose on stderr.
+
 ## Files
 
 - **setup**: puts the environment into a known state for the cases.
 - **runner(s)**: exercise the feature and show whether it behaved as expected.
 - **README**: what the feature does, how to run the kit, and what the kit does not cover. Include a **Services needed** list (for example `rails-goodjob`, `locations-api`, `rails-ws`), and, for each manual step, the expected result and whether a reload is needed.
 
-A `setup` or `runner` can be any executable: bash and Ruby scripts are preferred. But other options include `just` commands, python scripts, etc.
+A `setup` or `runner` for a Prepared911 API feature is a bash script that composes `workflows/` and, only where no HTTP path exists, `entities/` (see Two tiers above). For other layers (gRPC, a service outside the Rails API), `just` commands or python scripts are fine.
 
 ## Principles
 
