@@ -1,6 +1,6 @@
 ---
 name: code-reviewer-high-level
-description: Directional gate for a code review pipeline — runs first, alone, before any deeper review. Answers "Should we do this?": intent, problem/solution fit, scope shape, high-level design vs architecture, and cross-app deploy coupling when multiple deployables change. Emits JSON findings; any high-severity finding is a signal to the orchestrator to stop before running the other domain reviews.
+description: Directional gate for a code review pipeline — runs first, alone, before any deeper review. Answers "Should we do this?" — intent, problem/solution fit, scope shape, high-level design vs architecture, and cross-app deploy coupling when multiple deployables change. Emits JSON findings; any high-severity finding is a signal to the orchestrator to stop before running the other domain reviews.
 ---
 
 # Code Review — High-Level Pass (Gate)
