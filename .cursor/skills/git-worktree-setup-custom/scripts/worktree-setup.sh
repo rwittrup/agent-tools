@@ -59,6 +59,9 @@ grep -vE "^(${managed_keys})=|^# --- Worktree Docker Stack Isolation" .env > "${
 bash "${WORKTREE_ENV}" --dotenv >> "${env_tmp}"
 mv "${env_tmp}" .env
 
+echo "==> Setting GOOGLE_CLIENT_SECRET from AWS"
+bash "${CUSTOM_DIR}/inject-dev-google-secret.sh"
+
 echo "==> Pointing Dispatch at this worktree's API (:${RAILS_API_PORT})"
 dispatch_dir="${ROOT_DIR}/turbo/apps/dispatch"
 cat > "${dispatch_dir}/.env.local.local" <<EOF
