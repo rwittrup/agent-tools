@@ -25,6 +25,9 @@ if [[ ! -f .env.local.local ]]; then
 fi
 
 pnpm install --frozen-lockfile
+# Generated *.graphql.ts files are gitignored and Vite does not make them. A stale set
+# leaves Dispatch on "Loading Prepared..." with 404s for the missing modules.
+(cd ../.. && pnpm codegen)
 CONFIG_ENV=local node scripts/loadConfig.js
 echo "Dispatch UI: http://localhost:${DISPATCH_PORT}"
 NODE_ENV=development exec pnpm exec vite --clearScreen=false --host=0.0.0.0 --port="${DISPATCH_PORT}" --strictPort --force
