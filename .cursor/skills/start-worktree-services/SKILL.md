@@ -1,17 +1,17 @@
 ---
 name: start-worktree-services
-description: Start the API, seeded database and Dispatch inside a linked git worktree so a feature-validation-kit can run against a live app. Use after git-worktree-setup has passed, before running any validation kit setup.sh/run.sh, driving Dispatch in a browser, or hitting GraphQL on a worktree stack.
+description: Start the API, seeded database and Dispatch inside a linked git worktree so a feature-validation-kit can run against a live app. Use after git-worktree-setup-custom has passed, before running any validation kit setup.sh/run.sh, driving Dispatch in a browser, or hitting GraphQL on a worktree stack.
 ---
 
 # Start worktree services
 
-`git-worktree-setup` leaves a **spec-only** stack: databases and `rails-api`, no Redpanda, no seed data, no Dispatch. Validation kits need a live app. Start it in the order below; every step has a check, and each check is the exit gate for its step.
+`git-worktree-setup-custom` leaves a **spec-only** stack: databases and `rails-api`, no Redpanda, no seed data, no Dispatch. Validation kits need a live app. Start it in the order below; every step has a check, and each check is the exit gate for its step.
 
 Run everything from inside the worktree. Each command is a single plain command: the harness refuses heredocs, `for` loops and computed `cd` in a worktree.
 
 ## Steps
 
-1. **Precondition.** `just worktree-info` shows a `COMPOSE_PROJECT_NAME` other than `apps` and no `WARNING:`. If not, run `git-worktree-setup` first.
+1. **Precondition.** `bash ~/.claude/skills/git-worktree-setup-custom/scripts/worktree-env.sh --status` shows a `COMPOSE_PROJECT_NAME` other than `apps`, a `Dispatch UI:` line and no `WARNING:`. If not, run `git-worktree-setup-custom` first.
 2. **Seed and boot the API.** `just api reset-db`. It starts Redpanda and `rbac-api`, drops, migrates and seeds, which creates six dispatch centers (including "Engineering PD") and the `rwittrup+*@prepared911.com` users. Never create a center with FactoryBot: `versions` and `dispatch_center_settings` foreign keys make it undeletable. Done when the command exits 0. Never pipe a gate command through `head` or `tail`: that hides its exit status. Write output to a file in the scratchpad and echo the status, e.g. `just api reset-db > <scratchpad>/reset.log 2>&1; echo exit=$?`, or grep the log for the success line. Report what you saw, not what you expected.
 3. **Start the API.** `just dc-start rails-api rails-grpc rails-goodjob rails-ws rails-ws-rpc locations-api rbac-api incident-search`. `reset-db` stops every `rails-*` service, so restart them all here. Drop a service only if the kit's README "Services needed" excludes it. Done when `curl -s -o /dev/null -w "%{http_code}" http://localhost:<RAILS_API_PORT>/healthz` prints `200`, with the port from `just worktree-info`.
 4. **Start Dispatch** only if the kit drives the UI. See "Dispatch" below. Done when `curl` on the Dispatch port prints `200` and `curl -s http://localhost:<DISPATCH_PORT>/config/appConfig.json` shows `API_BASE_URL` on this worktree's API port, not 3000.
@@ -21,12 +21,11 @@ Skip step 4 and the browser check for API-only kits. The API runner scripts need
 
 ## Dispatch
 
-`just dispatch run local` binds Vite to `DISPATCH_PORT` (`3002 + PORT_OFFSET`) and points it at this worktree's API port, both read from the worktree `.env`. `just worktree-info` prints the `Dispatch UI:` URL.
+Run Dispatch with `bash ~/.claude/skills/git-worktree-setup-custom/scripts/dispatch-run.sh` from inside the worktree, in the background. It binds `DISPATCH_PORT` (`3002 + PORT_OFFSET`, printed as `Dispatch UI:` by `bash ~/.claude/skills/git-worktree-setup-custom/scripts/worktree-env.sh --status`) with `--strictPort`, so worktrees run side by side. Never use `just dispatch run`: its package.json scripts hard-code `--port=3002`, and Vite hops to the next free port when 3002 is taken.
 
-- First run `grep DISPATCH_PORT .env`. If it is set, `just dispatch run local` binds that port and this worktree's API. If it is missing, Vite falls back to 3002 and the main checkout's API (`turbo/apps/dispatch/.env.local` defaults: `API_BASE_URL` 3000, `API_WEBSOCKET_URL` `ws://127.0.0.1:8080/cable`, OAuth redirect 3000). Do not run it.
-- Re-running `just worktree-setup` may not write `DISPATCH_PORT` (it did not on RSP-306). Then use the manual path: write `API_BASE_URL=http://127.0.0.1:<RAILS_API_PORT>` to the gitignored `turbo/apps/dispatch/.env.local.local`, run `CONFIG_ENV=local node scripts/loadConfig.js`, then from `turbo/apps/dispatch` run in the background `NODE_ENV=development pnpm exec vite --host=0.0.0.0 --port=3002 --strictPort`.
-- Google sign-in works only from `http://localhost:3002`: the redirect URI is built from `window.location.host` (`src/utils/oauth/OAuthProvider.ts`) and only that origin is registered. If the user signs in with Google, serve on exactly 3002 (not 3002 + offset) and tell them to use `localhost`, not `127.0.0.1`.
-- If 3002 is taken, `lsof -nP -iTCP:3002 -sTCP:LISTEN` shows the owner. Stop it only if this session started it, or `lsof -a -p <pid> -d cwd -Fn` shows a finished worktree. Kill by pid, never `pkill` by pattern (the harness blocks it and it can kill other worktrees' servers). If a live worktree owns it, say so and ask the user; do not pick another port silently.
+- `worktree-setup.sh` writes the gitignored `turbo/apps/dispatch/.env.local.local`, so Dispatch calls this worktree's API. Without it Dispatch calls the main checkout's API on :3000, and login fails with `Login error. Try again or contact support.` `dispatch-run.sh` refuses to start without it.
+- Google sign-in redirects to Dispatch's own origin (`src/utils/oauth/OAuthProvider.ts` builds the redirect URI from `window.location.host`). It worked from offset ports such as 4802 (RSP-290). If Google rejects a port with `redirect_uri_mismatch`, that port is not registered with the Google client: report the port and ask the user, do not switch ports silently. Tell the user to use `localhost`, not `127.0.0.1`.
+- If `dispatch-run.sh` reports the port is in use, `lsof -nP -iTCP:<DISPATCH_PORT> -sTCP:LISTEN` shows the owner. Stop it only if this session started it, or `lsof -a -p <pid> -d cwd -Fn` shows a finished worktree. Kill by pid, never `pkill` by pattern (the harness blocks it and it can kill other worktrees' servers). If a live worktree owns it, say so and ask the user; do not pick another port silently.
 - Start Vite in the background and poll the port: codegen takes about a minute. Check the log line `API_BASE_URL=` names this worktree's API port.
 
 ## 1Password
@@ -60,4 +59,4 @@ Symptom → cause → fix.
 - `rubocop: command not found` on the host → run it inside the API container.
 - Go mocks, `schema.graphql` or `structure.sql` modified after boot → generated churn → `git restore` before committing.
 
-Related: `git-worktree-setup` (provisioning), `feature-validation-kit` (what the kit contains), `ruby-api-tester` (GraphQL with a real token).
+Related: `git-worktree-setup-custom` (provisioning, ports), `feature-validation-kit` (what the kit contains), `ruby-api-tester` (GraphQL with a real token).
