@@ -43,6 +43,8 @@ Do **not** until `SMOKE: PASS`: explore or implement the ticket, `just api minim
 
 `bash ~/.claude/skills/git-worktree-setup-custom/scripts/worktree-env.sh --status` shows `WARNING:` if the worktree is not set up. Other `just dc-*` and `just api` commands do not check, so run setup first.
 
+`.env` is regenerated from 1Password by `worktree-setup.sh` and by every `just` recipe that depends on `_root-env` (`dc-start`, `reset-db` and others), which drops `DISPATCH_PORT` and the AWS-sourced `GOOGLE_CLIENT_SECRET`. `bash ~/.claude/skills/git-worktree-setup-custom/scripts/restore-env.sh` puts them back without touching Docker or 1Password (exit 4 if the secret cannot be read from AWS; it uses the `prepared-dev` profile unless `AWS_PROFILE` is set). Run it after any such recipe; `start-worktree-services/scripts/services-up.sh` does so for you. `worktree-setup.sh` calls it too.
+
 Dispatch: from inside the worktree run `bash ~/.claude/skills/git-worktree-setup-custom/scripts/dispatch-run.sh`. It serves on `DISPATCH_PORT` with `--strictPort` (a taken port fails instead of hopping) and refuses to start without the worktree-local config. Do not use `just dispatch run`: it hard-codes 3002.
 
 Related: `ruby-database-best-practices` (migration versions), `rails-testing` (writing specs).
@@ -54,6 +56,7 @@ Add one entry per problem: symptom → cause → fix.
 - `LoadError: cannot load such file -- /app/spec/...` → the command ran in the main stack's container → run `worktree-setup.sh`.
 - `docker compose up --wait` hangs or fails on `rails-db-replica` → first-run replica standby sync during `worktree-setup.sh` → do not hand-roll partial `docker compose up` or copy env from another checkout; re-run `worktree-setup.sh` (idempotent). If it still fails after one retry, stop and ask the user — do not debug replica issues as ticket work.
 - `.env` or `.env.local` edited by hand → `.env` is regenerated and the pins are read from `.env.local` → pin `COMPOSE_PROJECT_NAME` / `PORT_OFFSET` in `.env.local` only, then re-run setup.
+- `DISPATCH_PORT` missing from `.env`, or `inject-dev-google-secret: could not read dev/api/dispatch_google_client` → a `just` recipe regenerated `.env`, or the SSO session for `prepared-dev` expired → `aws sso login --profile prepared-dev`, then `restore-env.sh`.
 - New migration, spec fails on schema → the test DB is not migrated → `docker compose exec -T rails-api env RAILS_ENV=test SKIP_POSTGIS_DB_SETUP=true bundle exec rake db:migrate`. Use a unique 14-digit version.
 - Annotate, `apps/ruby/api/db/structure.sql`, PostGIS model `# Database name:` lines, or Go mock files modified after migrate or startup → generated churn → `git restore` those paths before committing.
 - `parallel:spec` reports duplicate pending migrations on `live-api-test*` after `parallel:migrate` → local parallel test DB drift, usually unrelated to the feature branch → do not loop migrate/rerun; use `just api rspec <paths>` for proof and leave full parallel suites to CI or a human.

@@ -29,6 +29,19 @@ For features reached through the Rails API (UNCAD/CFS and similar), build the ki
 
 A kit is `README.md`, `setup.sh` (walkthrough state plus what to look at in Dispatch) and `validate.sh` (cases that each build their own CFS, PASS/FAIL per case, exit 1 on any FAIL, ending with a `Step | Result | Verdict` table to paste into the ticket). Print `key=value` on stdout and prose on stderr.
 
+Before writing a workflow, entity or setup step, read the cheat sheet in `docs/uncad/validation/README.md`: it lists every existing workflow and entity with its flags, and the action you need is often there already. When you add or extend a shared piece, update that cheat sheet and the layout in `DESIGN.md` in the same change.
+
+- **Source every workflow at the top of a script, before the first `expect_` call.** Each workflow sources `lib/expect.sh`, which resets the results table and the failure count; a workflow sourced mid-run drops earlier rows and can turn an earlier FAIL into exit 0. `scripts/kit-run.sh` lints for this.
+- **Measure each asynchronous transition before choosing a timeout.** Poll with timestamps and print each state change, then put the measured lag in the README. A guessed timeout was wrong in RSP-288: a stopped call stayed LIVE for about 148 seconds before reading ENDED.
+
+## Simulated calls
+
+A kit that needs a real call (call audio, transcript, live updates) uses the audio demo, not a factory chatroom: `workflows/start-audio-demo` starts a scripted call and prints `chatroom_id`; `workflows/get-chatroom-audio --wait live|ended|recorded` reads its state; `workflows/stop-audio-demo` ends it. Start it without the API's own CFS (the default): that CFS is CAD-owned, and Prepared911 refuses to assign units to it. Give the call a CFS a responder can work with `create-cfs`, then `entities/link-cfs-chatroom --id <cfs> --chatroom <chatroom_id>`, then `assign-cfs`. The environment needs `start-worktree-services/scripts/services-up.sh --audio`. `docs/uncad/validation/responder-my-call-audio-graphql/` is the worked example: opt-in `KIT_AUDIO_DEMO=1` cases in `validate.sh` and `KIT_LIVE_CALL=1` in `setup.sh`, so the default run stays fast and needs no audio pipeline.
+
+## Running a kit
+
+Run `validate.sh` through `bash ~/.claude/skills/feature-validation-kit/scripts/kit-run.sh <kit-dir>`, with any `KIT_*` opt-ins in the environment. It lints the kit's scripts, runs `validate.sh`, and cross-checks the PASS/FAIL lines against the results table and the exit code. Its last line is the verdict: `KIT-RUN: OK`, `FAIL`, or `INCONSISTENT REPORT` (a FAIL could be hidden behind exit 0; exit 7). A lint failure exits 6 before anything runs.
+
 ## Files
 
 - **setup**: puts the environment into a known state for the cases.

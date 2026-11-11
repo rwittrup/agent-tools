@@ -12,6 +12,10 @@ set -uo pipefail
 
 cd "$(git rev-parse --show-toplevel)"
 
+# The profile root-env.sh uses. With none set, `aws` uses the default profile, which is usually
+# not logged in, and the read below fails with only the warning further down.
+export AWS_PROFILE="${AWS_PROFILE:-prepared-dev}"
+
 secret="$(aws secretsmanager get-secret-value --secret-id dev/api/dispatch_google_client \
   --query SecretString --output text 2>/dev/null | jq -r '.client_secret // empty' 2>/dev/null)"
 
