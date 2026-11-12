@@ -21,7 +21,7 @@ Touch **maintainability** only where it affects **observability or debuggability
 1. Trace the happy path through the changed code.
 2. Walk failure and edge paths; if the change touches multiple deployables, consider partial-deploy scenarios (one app ships before the other).
 3. Read tests as **evidence**; call out coverage holes and brittle tests.
-4. Turn what you found into findings using the Outputs format below. A finding you're confident will actually break in practice is high severity; something worth addressing but not a guaranteed break (a weak assumption, a coverage gap) is low severity.
+4. Turn what you found into findings using the Outputs format below. A finding you're confident will actually break in practice is high severity; a failure you can trace from the diff that needs a specific condition to trigger is medium severity; a weak assumption or coverage gap is low severity.
 
 # Inputs
 
@@ -40,7 +40,7 @@ A summary of findings, as JSON.
     "finding": "string — the issue, specific enough to act on: what breaks, and under what condition",
     "location": "string 'path/to/file.ext:line' or 'path/to/file.ext:start-end', or null if the issue isn't tied to one line (e.g. an untested scenario spanning a whole method)",
     "type": "correctness | testing",
-    "severity": "high | low"
+    "severity": "high | medium | low"
   }
 ]
 ```

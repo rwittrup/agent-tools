@@ -21,7 +21,7 @@ Defer **team-wide convention checks** and **idiomatic framework micro-style** to
 1. Deep-read the changed code's hotspots first — the parts doing real logic, not boilerplate.
 2. Note "wait, what does this do?" moments and duplication.
 3. Prefer findings that reduce cognitive load over stylistic preference — that's polish's lane.
-4. Turn what you found into findings using the Outputs format below. Something that will actively mislead a future maintainer (e.g. a non-obvious tradeoff with zero explanation) is high severity; a naming or structure nicety is low severity.
+4. Turn what you found into findings using the Outputs format below. Something that will actively mislead a future maintainer (e.g. a non-obvious tradeoff with zero explanation) is high severity; code that slows a reader down (tangled flow, duplication, a hidden side effect) is medium severity; a naming or structure nicety is low severity.
 
 # Inputs
 
@@ -40,7 +40,7 @@ A summary of findings, as JSON.
     "finding": "string — what's hard to follow or maintain, and why it matters to a future reader",
     "location": "string 'path/to/file.ext:line' or 'path/to/file.ext:start-end', or null if it's a cross-cutting structural observation",
     "type": "design | readability | maintainability",
-    "severity": "high | low"
+    "severity": "high | medium | low"
   }
 ]
 ```

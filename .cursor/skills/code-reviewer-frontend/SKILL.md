@@ -26,7 +26,7 @@ Load each of these by name when it is present in the repo under review. Skip any
 1. If the diff does not touch UI (`.tsx`, `.ts` components, `.scss`, styling), return an empty array.
 2. Load the skills above that are present.
 3. Review the diff against those skills. A missing product skill is not itself a finding.
-4. Emit one finding per violation. High severity means the change breaks the design system, localization, or a stated frontend rule in a way a reviewer would send back. Low severity is drift worth fixing that does not block.
+4. Emit one finding per violation. High severity means the change breaks the design system, localization, or a stated frontend rule in a way a reviewer would send back. Medium severity is a stated rule broken in a way worth fixing in this change, but a reviewer would not send it back alone. Low severity is drift that does not block.
 
 # Inputs
 
@@ -43,7 +43,7 @@ A JSON array in the same shape **code-reviewing** produces. Use `type` of `styli
     "finding": "string — the violation, specific enough to act on",
     "location": "string 'path/to/file.ext:line' or null",
     "type": "styling | convention | design | maintainability",
-    "severity": "high | low"
+    "severity": "high | medium | low"
   }
 ]
 ```

@@ -7,7 +7,7 @@ description: Confidence filter for a code review pipeline — runs after the hig
 
 Several domain reviewers just looked at this change independently and didn't cross-check each other. Some of what they flagged as `severity: "high"` will be real, and some will be a misreading of the diff, a pre-existing issue, or something that only looks wrong out of context. Your job is to be the single point where every high-severity candidate finding gets re-checked against the actual code before it's allowed to reach the author as a blocker.
 
-**CRITICAL: only high-signal findings survive.** A false high-severity finding costs the author's trust and wastes their time; a missed one gets caught in normal review anyway. When in doubt, drop it (i.e. don't include it in your output — or, if you want to preserve it for visibility, downgrade its `severity` to `"low"` rather than dropping it silently).
+**CRITICAL: only high-signal findings survive.** A false high-severity finding costs the author's trust and wastes their time; a missed one gets caught in normal review anyway. When in doubt, drop it (i.e. don't include it in your output — or, if you want to preserve it for visibility, downgrade its `severity` to `"medium"` or `"low"` rather than dropping it silently).
 
 ## What counts as high-signal (keep these at high severity)
 
@@ -15,7 +15,9 @@ Several domain reviewers just looked at this change independently and didn't cro
 - The code will definitely produce wrong results **regardless of input** — a clear logic error, not one that only manifests under some inputs you're speculating about.
 - A clear, unambiguous violation of a rule the project documents somewhere and that you can quote directly — a project guidance file (e.g. `CLAUDE.md`, `AGENTS.md`, a CONTRIBUTING doc, a style guide), a linter/formatter config, or an explicit comment in the code. Don't infer a "rule" from a pattern you merely noticed elsewhere; it has to be written down and quotable.
 
-## What does not survive at high severity (drop, or downgrade to low)
+## What does not survive at high severity (drop, or downgrade to medium or low)
+
+Downgrade to `"medium"` when the issue is real and introduced by the diff but does not meet the high-signal bar above. Downgrade to `"low"` for nitpicks and speculation.
 
 - Pre-existing issues — the diff didn't introduce this; it was already there.
 - Something that looks like a bug on first read but is actually correct once you trace the surrounding logic.
@@ -31,7 +33,7 @@ Several domain reviewers just looked at this change independently and didn't cro
 ## Workflow
 
 1. For each candidate finding, go read the actual code it refers to — don't take the finding's description at face value.
-2. Decide: keep at high severity (confirmed), downgrade to low severity, or drop entirely, using the lists above.
+2. Decide: keep at high severity (confirmed), downgrade to medium or low severity, or drop entirely, using the lists above.
 3. If you keep or downgrade a finding, make sure its `location` still points at real code you verified, not just what the original reviewer claimed.
 
 # Inputs
@@ -52,12 +54,12 @@ The same findings, filtered — as JSON.
     "finding": "string — same or refined text from the candidate, corrected if your investigation found the original description was slightly off",
     "location": "string 'path/to/file.ext:line' or 'path/to/file.ext:start-end', or null",
     "type": "same type as the candidate finding",
-    "severity": "high | low"
+    "severity": "high | medium | low"
   }
 ]
 ```
 
-If nothing survives at high severity, return an array where every candidate has been downgraded to `"low"` or omitted entirely — an empty or all-low result is a valid, useful outcome, not a failure of this pass.
+If nothing survives at high severity, return an array where every candidate has been downgraded to `"medium"` or `"low"`, or omitted entirely — an empty or all-downgraded result is a valid, useful outcome, not a failure of this pass.
 
 ## Example
 

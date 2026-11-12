@@ -19,7 +19,7 @@ You **do not** re-litigate architecture or behavioral correctness — that's wha
 ## Workflow
 
 1. Scan for convention drift, lint/style alignment, and "feels like our code" signals.
-2. Turn what you found into findings using the Outputs format below. Reserve high severity for something you're confident is a real problem, not a style preference — most polish findings should be low severity by nature of this pass's scope.
+2. Turn what you found into findings using the Outputs format below. Reserve high severity for something you're confident is a real problem, not a style preference. Use medium for a clear break from a sibling-file convention; most polish findings should be low severity by nature of this pass's scope.
 
 # Inputs
 
@@ -38,7 +38,7 @@ A summary of findings, as JSON.
     "finding": "string — what deviates from the codebase's own convention or idiom, and what convention it deviates from",
     "location": "string 'path/to/file.ext:line' or 'path/to/file.ext:start-end', or null if it's a repo-wide observation",
     "type": "convention | styling",
-    "severity": "high | low"
+    "severity": "high | medium | low"
   }
 ]
 ```
