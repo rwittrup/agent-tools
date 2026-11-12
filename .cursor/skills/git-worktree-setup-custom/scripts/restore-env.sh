@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 # Re-apply what this skill layers on top of a regenerated .env: the worktree block (with
-# DISPATCH_PORT), the AWS-sourced GOOGLE_CLIENT_SECRET, and Dispatch's API pointer.
+# DISPATCH_PORT), the AWS-sourced GOOGLE_CLIENT_SECRET, Dispatch's API, websocket and call-handler URLs, and the
+# host-port override (compose-ports.sh).
 #
 # Usage: restore-env.sh [--allow-1password]
 # Exit:  0 restored | 1 no .env, or not a linked worktree | 4 Google secret not read from AWS
@@ -61,11 +62,19 @@ printf '%s\n' "${inject_out}" >&2
 # Dispatch serves on DISPATCH_PORT and must call this worktree's API; the committed
 # turbo/apps/dispatch/.env.local points at :3000, the main checkout's. loadConfig.js overlays
 # the gitignored .env.local.local on top.
+#
+# Two more Dispatch URLs name host ports that docker-compose.yaml publishes as literals, which compose-ports.sh may
+# have moved off another worktree's: the websocket (rails-ws, stock 8080) and call-handler (stock 7002).
+bash "${CUSTOM_DIR}/compose-ports.sh" write --quiet || echo "restore-env: WARNING compose-ports.sh failed; using stock host ports" >&2
+ws_port="$(bash "${CUSTOM_DIR}/compose-ports.sh" port rails-ws 8080 2>/dev/null || true)"
+call_handler_port="$(bash "${CUSTOM_DIR}/compose-ports.sh" port call-handler 8080 2>/dev/null || true)"
 dispatch_dir="${ROOT_DIR}/turbo/apps/dispatch"
-cat > "${dispatch_dir}/.env.local.local" <<EOF
-API_BASE_URL=http://127.0.0.1:${RAILS_API_PORT}
-OAUTH_REDIRECT=http://127.0.0.1:${RAILS_API_PORT}/auth/:provider/callback
-EOF
+{
+  echo "API_BASE_URL=http://127.0.0.1:${RAILS_API_PORT}"
+  echo "OAUTH_REDIRECT=http://127.0.0.1:${RAILS_API_PORT}/auth/:provider/callback"
+  [[ -z "${ws_port}" ]] || echo "API_WEBSOCKET_URL=ws://127.0.0.1:${ws_port}/cable"
+  [[ -z "${call_handler_port}" ]] || echo "CALL_HANDLER_URL=http://localhost:${call_handler_port}"
+} > "${dispatch_dir}/.env.local.local"
 (cd "${dispatch_dir}" && CONFIG_ENV=local node scripts/loadConfig.js >/dev/null)
 
 dispatch_port="$(grep -E '^DISPATCH_PORT=' .env | tail -n 1 | cut -d= -f2- | tr -d '"')"

@@ -9,7 +9,7 @@
 #   --extra      more compose services, for example "incident-search" for the Triage list
 # Exit:  0 up and verified | non-zero names the failing step (preflight: 1-3, restore-env: 4, dispatch: 5)
 #
-# Order: preflight -> every `just` command -> restore-env.sh once -> verify. `just` regenerates .env from
+# Order: preflight -> compose-ports (free host ports) -> every `just` command -> restore-env.sh once -> verify. `just` regenerates .env from
 # 1Password each time, so restoring once after the last one is enough. Services already running are left
 # alone, which also skips the .env rewrite. Logs are in GATE_LOG_DIR (set it to your scratchpad).
 
@@ -34,6 +34,11 @@ services="${API_SERVICES} ${extra}"
 
 bash "${SWS_DIR}/preflight.sh" || exit $?
 worktree_env
+
+# docker-compose.yaml publishes many host ports as literals, so another worktree's stack collides with this one.
+# Republish them on free ports before anything starts (idempotent; keeps ports it already chose).
+bash "${SETUP_DIR}/compose-ports.sh" write --quiet \
+  || say "SERVICES: WARNING compose-ports.sh failed; continuing with the stock host ports"
 
 if [[ "${reset}" -eq 1 ]]; then
   say "SERVICES: resetting the database (just api reset-db)"

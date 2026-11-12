@@ -245,6 +245,10 @@ case "${MODE}" in
     echo "Apps Redis:           localhost:${APPS_REDIS_PORT}"
     echo "ElasticMQ (SQS):      http://localhost:${ELASTIC_MQ_PORT}"
     echo "ElasticMQ UI:         http://localhost:${ELASTIC_MQ_UI_PORT}"
+    if [[ "${is_linked_worktree}" -eq 1 && -f "${toplevel}/docker-compose.override.yaml" ]]; then
+      echo "--- Host ports moved off the stock ones (docker-compose.override.yaml, by compose-ports.sh) ---"
+      (cd "${toplevel}" && bash "$(dirname "${BASH_SOURCE[0]}")/compose-ports.sh" list 2>/dev/null | sed 's/^/  /') || true
+    fi
     unsafe_port="$(unsafe_port_for_offset "${PORT_OFFSET}")"
     if [[ -n "${unsafe_port}" ]]; then
       echo "WARNING: ${unsafe_port% *} is on port ${unsafe_port##* }, which Chrome blocks (ERR_UNSAFE_PORT); remove PORT_OFFSET from .env.local, delete .env, and re-run: bash ~/.claude/skills/git-worktree-setup-custom/scripts/worktree-setup.sh"

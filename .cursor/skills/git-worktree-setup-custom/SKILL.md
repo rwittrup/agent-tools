@@ -5,7 +5,7 @@ description: Custom git-worktree-setup (scripts live in agent-tools, not the rep
 
 # Git worktree setup (custom)
 
-Copy of `git-worktree-setup` that runs this skill's `scripts/` instead of the repo's `just worktree-setup` / `just worktree-info`, so port changes can be validated before they merge into prepared911. Differences: `DISPATCH_PORT` (`3002 + PORT_OFFSET`), offsets that skip Chrome-blocked ports, and a worktree-local Dispatch config pointing at the worktree's API. Use `git-worktree-setup` for a worktree that must match the repo exactly.
+Copy of `git-worktree-setup` that runs this skill's `scripts/` instead of the repo's `just worktree-setup` / `just worktree-info`, so port changes can be validated before they merge into prepared911. Differences: `DISPATCH_PORT` (`3002 + PORT_OFFSET`), offsets that skip Chrome-blocked ports, a worktree-local Dispatch config pointing at the worktree's API, and host ports that `docker-compose.yaml` hard-codes republished on free ones (`compose-ports.sh`, below). Use `git-worktree-setup` for a worktree that must match the repo exactly.
 
 A fresh worktree has no `.env`, so `just` loads the main checkout's and every `docker compose` call hits the main stack. `worktree-setup.sh` fixes that. Do not hand-roll `.env`, ports or compose commands.
 
@@ -47,6 +47,19 @@ Do **not** until `SMOKE: PASS`: explore or implement the ticket, `just api minim
 
 Dispatch: from inside the worktree run `bash ~/.claude/skills/git-worktree-setup-custom/scripts/dispatch-run.sh`. It serves on `DISPATCH_PORT` with `--strictPort` (a taken port fails instead of hopping) and refuses to start without the worktree-local config. Do not use `just dispatch run`: it hard-codes 3002.
 
+## Host ports
+
+`PORT_OFFSET` moves only the ports `docker-compose.yaml` builds from variables. It publishes many more as literals (grafana 15301, otelcol 8126 and 514, rbac-api 50056, rails-ws 8080 ...), so two worktrees' stacks collide on them. `compose-ports.sh` fixes that without touching the repo: it writes a git-excluded `docker-compose.override.yaml` that republishes each literal port on a free one (`!override`, host side only; services still reach each other by compose DNS).
+
+Run from inside the worktree: `SCRIPTS=~/.claude/skills/git-worktree-setup-custom/scripts`.
+
+- `bash $SCRIPTS/compose-ports.sh write [--repair PORT]` regenerates the override. It keeps the port it chose last time (a rerun never recreates containers), else stock + `PORT_OFFSET`, else the next free port. A port is free when nothing is bound to it, Chromium allows it, and nothing else in the stack publishes it. `restore-env.sh` and `services-up.sh` run it; a main checkout is left alone.
+- `compose-ports.sh list` shows what moved (`worktree-env.sh --status` includes it).
+- `compose-ports.sh port <service> <container-port>` prints the host port a service really listens on. Use it instead of a stock port from a kit's README or script (the `derive-cfs-beats-locations-rpc` kit's `localhost:50055` becomes `localhost:$(compose-ports.sh port locations-api 50051)`).
+- `compose-ports.sh self-check` runs the planner's assertions without Docker. Rerun it after editing `compose-ports.py`.
+
+`restore-env.sh` also writes `API_WEBSOCKET_URL` (rails-ws) and `CALL_HANDLER_URL` (call-handler) into Dispatch's gitignored `.env.local.local`, so the browser reaches the shifted ports. Delete `docker-compose.override.yaml` to return to the stock ports.
+
 Related: `ruby-database-best-practices` (migration versions), `rails-testing` (writing specs).
 
 ## Known problems
@@ -60,6 +73,8 @@ Add one entry per problem: symptom → cause → fix.
 - New migration, spec fails on schema → the test DB is not migrated → `docker compose exec -T rails-api env RAILS_ENV=test SKIP_POSTGIS_DB_SETUP=true bundle exec rake db:migrate`. Use a unique 14-digit version.
 - Annotate, `apps/ruby/api/db/structure.sql`, PostGIS model `# Database name:` lines, or Go mock files modified after migrate or startup → generated churn → `git restore` those paths before committing.
 - `parallel:spec` reports duplicate pending migrations on `live-api-test*` after `parallel:migrate` → local parallel test DB drift, usually unrelated to the feature branch → do not loop migrate/rerun; use `just api rspec <paths>` for proof and leave full parallel suites to CI or a human.
+- `Bind for 0.0.0.0:<port> failed: port is already allocated` → another stack holds a host port → `compose-ports.sh write --repair <port>` moves that mapping and `docker compose up` works. A port that follows `PORT_OFFSET` (Rails API, databases) is not movable that way: pin another `PORT_OFFSET` in `.env.local`, delete `.env`, rerun `worktree-setup.sh`. Never stop another worktree's stack for it.
+- A trunk rebase adds a literal host port and it collides → the override predates it → `compose-ports.sh write` (`services-up.sh` and `restore-env.sh` already do).
 - `Datadog ... otelcol:8126` errors in spec output → the spec-only stack skips the collector → ignore.
 - Harness refuses `cd` to the main checkout, `{{...}}` format strings or long pipelines → guardrail → stay in the worktree and use simpler commands.
 - Untracked docs exist only in the main checkout → not in the worktree → read them by absolute path.

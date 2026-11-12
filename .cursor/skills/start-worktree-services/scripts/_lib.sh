@@ -41,17 +41,30 @@ env_secret_sha() {
   printf %s "${v}" | shasum -a 256 | cut -c1-12
 }
 
-# explain_port_conflict LOG: when LOG holds "Bind for ...:PORT failed: port is already allocated", say which
-# container holds PORT. Some host ports (otelcol's 514, for one) are not offset per worktree, so two worktrees'
-# stacks collide. The holder is usually another worktree's live stack: report it, never stop it.
+# conflict_port LOG: the host port of a bind failure in LOG, or nothing. Matches both wordings Docker uses:
+#   "Bind for 0.0.0.0:15301 failed: port is already allocated"
+#   "failed to bind host port 0.0.0.0:15301/tcp: address already in use"
+conflict_port() {
+  grep -Eo 'Bind for [^ ]*:[0-9]+ failed: port is already allocated|failed to bind host port [^ ]*:[0-9]+/(tcp|udp): address already in use' "$1" 2>/dev/null \
+    | head -n 1 | sed -E 's/.*:([0-9]+)( failed|\/(tcp|udp):).*/\1/'
+}
+
+# repair_port_conflict PORT: compose-ports.sh moves the mapping that failed to bind onto a free port (exit 0), so the
+# gate can retry. It cannot move a port that follows PORT_OFFSET or one a non-compose process holds (exit 4).
+repair_port_conflict() {
+  bash "${SETUP_DIR}/compose-ports.sh" write --repair "$1"
+}
+
+# explain_port_conflict LOG: the repair did not apply. Say who holds the port and what is left to try.
 explain_port_conflict() {
   local port holder
-  port="$(grep -Eo 'Bind for [^ ]*:[0-9]+ failed: port is already allocated' "$1" 2>/dev/null | head -n 1 | sed -E 's/.*:([0-9]+) failed.*/\1/')"
+  port="$(conflict_port "$1")"
   [[ -n "${port}" ]] || return 0
   holder="$(docker ps --filter "publish=${port}" --format '{{.Names}} ({{.Status}})' | head -n 3 | tr '\n' ' ')"
   say "PORT CONFLICT: host port ${port} is held by: ${holder:-<not a container; see: lsof -nP -iTCP:${port} -sTCP:LISTEN>}"
-  say "That is usually another worktree's running stack. Do not stop it unless the user says so;"
-  say "ask them to stop it (from that worktree: just dc-stop), then rerun."
+  say "compose-ports.sh could not move it. If ${port} is one of this worktree's PORT_OFFSET ports (Rails API, databases,"
+  say "Redpanda ...), pin another PORT_OFFSET in .env.local, delete .env and rerun worktree-setup.sh. Another worktree's"
+  say "stack is never the thing to stop: every compose-published literal port is shifted off it."
 }
 
 # wait_http URL CODE SECONDS: poll until URL answers CODE.

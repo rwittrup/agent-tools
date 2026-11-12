@@ -20,7 +20,7 @@ Run from inside the worktree. `SWS=~/.claude/skills/start-worktree-services/scri
 3. **When it stops, read the exit code.** 1 not a linked worktree, 2 Docker down, 3 AWS SSO expired, 4 Google secret not from AWS, 5 Dispatch port held by another process, 11/12/13 reset-db / API start / audio start failed, 14 `rails-api` has the wrong Google secret, 15 a service will not start, 16 `/healthz` is not 200. Exit 3: ask the user to run `! aws sso login --profile prepared-dev` and rerun. Never run the login yourself: it opens a browser and waits.
 4. **Hand off.** Only after you have seen `SERVICES: OK` and, for a UI kit, the Dispatch login page rendering in a real browser with no `Failed to fetch` (claude-in-chrome tools if available, otherwise ask the user to open it). curl passing is not a browser check. Then give the kit's README the API port, Dispatch URL and a seeded login. Print the port table from `just worktree-info` and add the browser-facing Dispatch URL; do not hand-build it. Report what you saw, not what you expected.
 
-`services-up.sh` runs preflight, every `just` command, `restore-env.sh` once, then verifies: services running, `rails-api` holding the same Google secret as `.env` (recreated if not), `/healthz` 200. `just` regenerates `.env` from 1Password on every `dc-start` and `reset-db`, dropping `DISPATCH_PORT` and the AWS Google secret, so restore once after the last one. Services already running are left alone, which skips the rewrite; `--rebuild` forces `dc-start` to pick up code changes. After any `just` recipe you run by hand, run `bash ~/.claude/skills/git-worktree-setup-custom/scripts/restore-env.sh`.
+`services-up.sh` runs preflight, `compose-ports.sh write` (free host ports, see "Host ports"), every `just` command, `restore-env.sh` once, then verifies: services running, `rails-api` holding the same Google secret as `.env` (recreated if not), `/healthz` 200. `just` regenerates `.env` from 1Password on every `dc-start` and `reset-db`, dropping `DISPATCH_PORT` and the AWS Google secret, so restore once after the last one. Services already running are left alone, which skips the rewrite; `--rebuild` forces `dc-start` to pick up code changes. After any `just` recipe you run by hand, run `bash ~/.claude/skills/git-worktree-setup-custom/scripts/restore-env.sh`.
 
 ## Audio
 
@@ -36,6 +36,12 @@ Timings measured locally: after a stop the call reads LIVE for about 148 seconds
 - On exit 5, `lsof -nP -iTCP:<DISPATCH_PORT> -sTCP:LISTEN` shows the owner. Stop it only if this session started it (`$GATE_LOG_DIR/dispatch.pid`), or `lsof -a -p <pid> -d cwd -Fn` shows a finished worktree. Kill by pid, never `pkill` by pattern: it can kill other worktrees' servers. If a live worktree owns it, say so and ask the user.
 - `dispatch-run.sh` runs `pnpm codegen` from `turbo/` before Vite (gitignored `*.graphql.ts` files go stale per branch). If you run codegen after Vite is already up, restart Vite: it caches the failed `.graphql.ts` resolution and keeps returning 404.
 
+## Host ports
+
+`docker-compose.yaml` publishes many host ports as literals (grafana 15301, otelcol 8126, rbac-api 50056, rails-ws 8080 and more: `compose-ports.sh list` shows them), so `PORT_OFFSET` does not move them and a second worktree's stack collides with the first. `services-up.sh` republishes them on free ports through a git-excluded `docker-compose.override.yaml` (`compose-ports.sh write`, in `git-worktree-setup-custom`), and `run-gate.sh` turns a `port is already allocated` failure into a repair: it moves that one port and reruns the command, up to three times. Another worktree's stack stays up.
+
+To find where a service really listens, run `bash ~/.claude/skills/git-worktree-setup-custom/scripts/compose-ports.sh port <service> <container-port>` (for example `port locations-api 50051`, never the stock 50055). Dispatch's websocket and call-handler URLs follow the shifted ports: `restore-env.sh` writes them to `.env.local.local`.
+
 ## 1Password
 
 Run `just` commands directly. 1Password prompts the user out of band; wait for the command to finish. Do not ask the user to run `op signin`. If a command still reports `Failed to automatically sign in`, retry it once after the prompt is answered.
@@ -45,7 +51,7 @@ Run `just` commands directly. 1Password prompts the user out of band; wait for t
 Symptom → cause → fix.
 
 - `reset-db` or `dc-start` hangs, or exits 255, with `aws sso login` and a browser URL in its log → the SSO session for `prepared-dev` expired and the recipe is waiting on a browser → `preflight.sh` catches this first (exit 3); ask the user to run `! aws sso login --profile prepared-dev`.
-- `Bind for 0.0.0.0:514 failed: port is already allocated` (or 15301, or another port) on `otelcol` or `grafana` → another worktree's running stack holds a host port that is not offset per worktree. `run-gate.sh` prints `PORT CONFLICT` with the holder → it is someone else's live stack: do not stop it, ask the user to stop it (`just dc-stop` from that worktree), then rerun.
+- `Bind for 0.0.0.0:<port> failed: port is already allocated` → another worktree's stack (or any process) holds a host port → `run-gate.sh` repairs it: `GATE …: host port N was taken; moved it and retrying`. When it prints `PORT CONFLICT … compose-ports.sh could not move it`, the port follows `PORT_OFFSET` (Rails API, databases, Redpanda) or a non-compose process holds it → pin another `PORT_OFFSET` in `.env.local`, delete `.env`, rerun `worktree-setup.sh`. By hand: `compose-ports.sh write --repair <port>`.
 - `dc-start` exits 1 with `container ...grafana... is unhealthy` → the observability sidecar's Pyroscope crash-loops → `run-gate.sh` retries twice; if it persists, rerun later. Nothing in the kit needs it.
 - `rails-db-replica` exits 137 → memory pressure → `services-up.sh` starts missing services once more; if it repeats, stop finished worktrees' stacks.
 - A simulated call ends but never reaches RECORDED, and `audio-recorder` logs `error creating recording file: open audio/<chatroom>/...: no such file or directory` → no writable `/audio` → `bash $SWS/audio-up.sh`.
@@ -59,7 +65,7 @@ Symptom → cause → fix.
   }).listen(6100, '127.0.0.1');
   ```
 
-  Then set `API_BASE_URL=http://127.0.0.1:6100` in `turbo/apps/dispatch/.env.local.local`, run `CONFIG_ENV=local node scripts/loadConfig.js` from `turbo/apps/dispatch`, and hard-reload. `public/config/appConfig.json` is read at runtime, so Vite needs no restart; the websocket on 8080 is unaffected.
+  Then set `API_BASE_URL=http://127.0.0.1:6100` in `turbo/apps/dispatch/.env.local.local`, run `CONFIG_ENV=local node scripts/loadConfig.js` from `turbo/apps/dispatch`, and hard-reload. `public/config/appConfig.json` is read at runtime, so Vite needs no restart; the websocket (`API_WEBSOCKET_URL`) is unaffected.
 - Dispatch login shows `Login error. Try again or contact support.`, `rails-api` logs `Google authorization code exchange refused` with `invalid_client` on `POST /auth/google/token` → `rails-api` is running with the 1Password `GOOGLE_CLIENT_SECRET`, which Google rejects → `services-up.sh` detects and recreates it; by hand: `restore-env.sh` (needs the SSO session), then `docker compose up -d --force-recreate --no-deps rails-api`.
 - `dispatch-run: no DISPATCH_PORT in .env` or `DISPATCH: no DISPATCH_PORT in .env` → a `just` recipe regenerated `.env` → `restore-env.sh`.
 - Dispatch stays on `Loading Prepared...`, console shows 404 for `*.graphql.ts` (e.g. `/DispatchCenterChatbotRelayMode.graphql.ts`), Vite log shows `Pre-transform error: Failed to load url ... .graphql.ts` → generated GraphQL files are stale or missing and Vite cached the failure → run `pnpm codegen` from `turbo/`, kill the Vite pid from `$GATE_LOG_DIR/dispatch.pid`, rerun `dispatch-up.sh`, then hard-reload.
