@@ -37,7 +37,7 @@ Do **not** until `SMOKE: PASS`: explore or implement the ticket, `just api minim
 
 2. `EnterWorktree` with `path=.worktrees/<slug>` and stay inside it. Do not `cd` to the main checkout. `EnterWorktree name=` always branches from `origin/trunk`, so it cannot stack.
 3. Run `bash ~/.claude/skills/git-worktree-setup-custom/scripts/worktree-env.sh --status`. If `COMPOSE_PROJECT_NAME` is `apps` or any `WARNING:` line appears, the worktree is not provisioned — continue to step 4; do not run any other `just api` or `docker compose` command.
-4. Run `bash ~/.claude/skills/git-worktree-setup-custom/scripts/worktree-setup.sh`.
+4. Run `bash ~/.claude/skills/git-worktree-setup-custom/scripts/worktree-setup.sh` in the background with no pipe (a `| tail` hides output until exit and masks the exit code). A first run can take over 10 minutes. When it exits, the last line is `SMOKE: PASS` or `SMOKE: FAIL`; no verdict means it died earlier, so read the output file for the last `==>` step.
 5. Run `bash ~/.claude/skills/git-worktree-setup-custom/scripts/worktree-env.sh --status` again. The project must not be `apps` and there must be no `WARNING:` line.
 6. Setup prints `SMOKE: PASS` at the end of step 4. From then on use `just api rspec <paths>`.
 
@@ -68,6 +68,7 @@ Add one entry per problem: symptom → cause → fix.
 
 - `LoadError: cannot load such file -- /app/spec/...` → the command ran in the main stack's container → run `worktree-setup.sh`.
 - `docker compose up --wait` hangs or fails on `rails-db-replica` → first-run replica standby sync during `worktree-setup.sh` → do not hand-roll partial `docker compose up` or copy env from another checkout; re-run `worktree-setup.sh` (idempotent). If it still fails after one retry, stop and ask the user — do not debug replica issues as ticket work.
+- `preflight: no valid AWS SSO session` (exit 3) → SSO expired → user runs `! aws sso login --profile prepared-dev`, then rerun setup.
 - `.env` or `.env.local` edited by hand → `.env` is regenerated and the pins are read from `.env.local` → pin `COMPOSE_PROJECT_NAME` / `PORT_OFFSET` in `.env.local` only, then re-run setup.
 - `DISPATCH_PORT` missing from `.env`, or `inject-dev-google-secret: could not read dev/api/dispatch_google_client` → a `just` recipe regenerated `.env`, or the SSO session for `prepared-dev` expired → `aws sso login --profile prepared-dev`, then `restore-env.sh`.
 - New migration, spec fails on schema → the test DB is not migrated → `docker compose exec -T rails-api env RAILS_ENV=test SKIP_POSTGIS_DB_SETUP=true bundle exec rake db:migrate`. Use a unique 14-digit version.

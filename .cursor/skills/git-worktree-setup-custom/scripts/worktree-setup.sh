@@ -45,7 +45,14 @@ echo "==> Generating .env"
 if [[ -n "${CLOUD_AGENT_INJECTED_SECRET_NAMES:-}" || "${SKIP_OP:-}" == "1" ]]; then
   bash dev/scripts/cloud-env.sh
 else
+  bash "${CUSTOM_DIR}/preflight.sh"
   bash dev/scripts/root-env.sh
+fi
+
+# restore-env.sh runs Dispatch's loadConfig.js, which needs dotenv; a fresh worktree has no node_modules.
+if ! node -e "require.resolve('dotenv',{paths:[process.argv[1]]})" turbo/apps/dispatch/scripts 2>/dev/null; then
+  echo "==> Installing turbo dependencies"
+  pnpm --dir turbo install --frozen-lockfile
 fi
 
 # The worktree block (DISPATCH_PORT), the AWS Google secret and Dispatch's API pointer all live
@@ -72,15 +79,18 @@ echo "==> Preparing test database"
 just api reset-spec-db single
 
 status=0
+verdict=
 if [[ "${run_smoke}" -eq 1 ]]; then
   echo "==> Smoke spec: ${SMOKE_SPEC}"
   if just api rspec "${SMOKE_SPEC}"; then
-    echo "SMOKE: PASS"
+    verdict="SMOKE: PASS"
   else
-    echo "SMOKE: FAIL" >&2
+    verdict="SMOKE: FAIL"
     status=1
   fi
 fi
 
 bash "${WORKTREE_ENV}" --status
+# Last line, after the long status listing, so a tail or grep finds it.
+[[ -z "${verdict}" ]] || echo "${verdict}" >&2
 exit "${status}"
