@@ -7,7 +7,9 @@ description: Produces structured tickets in Jira to provide developers and agent
 
 ## Purpose
 
-Write a useful Jira ticket with enough information so that developers and agents can implement the feature, but without forcing a specific implementation.
+Write a Jira ticket that carries everything an implementing agent needs, without prescribing the implementation.
+
+The agent starts with a fresh context and has none of the planning conversation that produced the ticket, so the ticket has to carry it. Point to code locations rather than prescribing the implementation, so the agent isn't stuck with a stale path.
 
 ---
 
@@ -15,82 +17,40 @@ Format of the ticket, along with word count limits for each section if applicabl
 
 ```
 # Problem - 50
-
-# Acceptance Criteria
-
-# Test Plan
-
-## Validation command
-
-# Out of scope
-
-# Product Constraints - if necessary
-
-# Approach - SEE BELOW
+# Requirements
+# Acceptance criteria
+# Out-of-scope (if necessary)
+# Glossary terms and relevant ADR's (if necessary)
+# Settled decisions (if necessary)
 ```
+
+Problem, Requirements, and Acceptance criteria are required for every ticket, no matter how small. The remaining sections are included only when they apply.
 
 # Problem
 - High-level summary of the problem and why this work is needed.
 - Not what you're building — why it matters and what problem it solves.
 
-# Acceptance Criteria
-- BDD styling, with Given, When, then
+# Requirements
+- What the system must do, written as behaviors.
+- Describe observable behavior, not implementation steps.
+
+# Acceptance criteria
+- Each criterion must be phrased so it can become a test: `/tdd` drives red-green from them and `/code-review` checks the diff against them.
+- BDD styling, with Given, When, Then
   ```
   Given [context],
-  When [action], 
+  When [action],
   Then [outcome]
   ```
-- Add as many as needed to fully cover the expected behavior
+- Add as many as needed to fully cover the requirements.
 
-# Test Plan and Validation command
-Numbered steps, each mapped to one or more acceptance criteria above.
-Each step must be specific enough that an agent can execute it without ambiguity.
-Example:
-1. Run integration tests — covers AC1, AC2
-2. Query DB for created record — covers AC3
-3. Check Datadog logs for expected trace — covers AC4
+# Out-of-scope (if necessary)
+- Explicit exclusions. These prevent most PR surprises.
 
-## Example tools and tests to be consider as part of the validation:
-- Unit tests
-- Integration tests
-- DB query
-- Ruby script
-- Other CLI tools - Datadog
-- BASH scripts / commands, including things like CLI commands
-- [others as relevant to this ticket]
+# Glossary terms and relevant ADR's (if necessary)
+- Domain terms from `GLOSSARY.md` the agent needs to read the ticket correctly.
+- Pointers to relevant ADRs or files. Point to locations, don't paste or prescribe code.
 
-## Available Tools
-- `just` (target: `just validate-[component]`)
-- Datadog MCP
-- Direct DB access
-- Ruby script execution
-- [others as relevant to this ticket]
-
-## Validation Command
-- Should be one command a user or agent can run that fully executes the test plan
-- It can run one or more tests
-- It should be a code block, that a user can copy and paste into a terminal to run
-
-# Out of scope
-- explicit exclusions to prevent scope creep
-
-# Product Constraints
-- any special constraints to restrict the approach
-- should be provided by a user - before specifying any constraints, ask the user to confirm - don't assume
-
-# Approach
-- The chosen approach in enough detail that an implementer can act without re-deriving the design.
-- Include: key files to modify, interfaces to define or change, patterns to follow, anything non-obvious.
-
-Within the `Approach` section, include more details depending on what part of the codebase is affected.
-
-Example, for a story involving the call-handler and call-transcription services, ruby API, and frontend:
-
-```
-# Approach
-## Call-handler and call-transcription - 50
-
-## Ruby - 50
-
-## Frontend - 50 
-```
+# Settled decisions (if necessary)
+- Decisions already made, so the agent doesn't re-litigate them.
+- Only record decisions the user actually made. Before listing one, ask the user to confirm — don't assume.
